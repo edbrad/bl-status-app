@@ -1,4 +1,4 @@
-<nav class="navbar navbar-static-top navbar-default" role="navigation">
+<nav class="navbar navbar-static-top navbar-inverse" role="navigation">
   <div class="container-fluid">
     <div class="navbar-header">
       <button type="button" class="navbar-toggle collapsed" (click)="isCollapsed = !isCollapsed">
@@ -9,16 +9,21 @@
       <a [routerLink]="['/']" class="navbar-brand">bl-status</a>
     </div>
     <div class="collapse navbar-collapse" id="bl-statusNavBar" [collapse]="isCollapsed">
-      <ul class="nav navbar-nav">
+      <ul class="nav navbar-nav" role="navigation">
         <li><a [routerLink]="['/']">HOME</a></li>
-        <li><a [routerLink]="['/sampleroom']">Sample Room</a></li>
-        <li><a [routerLink]="['/postalaccounting']">Postal Accounting</a></li>
-        <li><a [routerLink]="['/dropshipping']">Drop Shipping</a></li>
+        <li><a *ngIf="this.authenticationService.loggedInRoles.indexOf('SampleRoom') > -1" [routerLink]="['/sampleroom']">Sample Room</a></li>
+        <li><a *ngIf="this.authenticationService.loggedInRoles.indexOf('Accounting') > -1" [routerLink]="['/postalaccounting']">Postal Accounting</a></li>
+        <li><a *ngIf="this.authenticationService.loggedInRoles.indexOf('Dropshipping') > -1" [routerLink]="['/dropshipping']">Drop Shipping</a></li>
+        <li><a *ngIf="this.authenticationService.loggedInRoles.indexOf('Administrator') > -1" [routerLink]="['/admin']">Administration</a></li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
-        <li><a [routerLink]="['/admin']">Administration</a></li>
-        <!-- <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>-->
-        <li><a [routerLink]="['/login']"><span class="glyphicon glyphicon-log-in"></span> Log In</a></li>
+        <li><a *ngIf="!this.authenticationService.isLoggedIn()" class="log-li"
+          [routerLink]="['/login']"><span class="glyphicon glyphicon-log-in log-li"></span> Log In </a>
+        </li>
+        <li><a *ngIf="this.authenticationService.isLoggedIn()" class="log-li"
+          (click)="this.authenticationService.logout()" [routerLink]="['/home']"><span class="glyphicon glyphicon-log-out log-li">
+            </span> Log Out: {{this.authenticationService.getUsername()}} </a>
+        </li>
       </ul>
     </div>
   </div>

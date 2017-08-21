@@ -1,20 +1,29 @@
 <div class="container">
   <div class="row">
     <div class="form_bg">
-      <form>
+      <form name="form" (ngSubmit)="f.form.valid && login()" #f="ngForm" novalidate>
         <h2 class="text-center">Please Log In</h2>
         <br/>
-        <div class="form-group">
-          <input class="form-control" id="username" placeholder="User Name" required>
+        <div class="form-group" [ngClass]="{ 'has-error': f.submitted && !username.valid }">
+          <!--<input class="form-control" id="username" placeholder="User Name" required>-->
+          <input id="username" type="text" class="form-control" name="username" [(ngModel)]="model.username"
+          #username="ngModel" placeholder="User Name" required />
+          <div *ngIf="f.submitted && !username.valid" class="help-block">User Name is required</div>
         </div>
-        <div class="form-group">
-          <input type="password" class="form-control" id="pwd" placeholder="Password" required>
+        <div class="form-group" [ngClass]="{ 'has-error': f.submitted && !password.valid }">
+          <!--<input type="password" class="form-control" id="pwd" placeholder="Password" required>-->
+          <input id="password" type="password" class="form-control" name="password" [(ngModel)]="model.password"
+          #password="ngModel" placeholder="Password" required />
+          <div *ngIf="f.submitted && !password.valid" class="help-block">Password is required</div>
         </div>
         <br/>
         <div class="align-center">
-          <button type="submit" class="btn btn-default" id="login">Log In</button>
+          <button [disabled]="loading" type="submit" class="btn btn-default" id="login">Log In</button>
         </div>
       </form>
+      <div class="align-center message">
+        <p>{{message}}</p>
+      </div>
     </div>
   </div>
 </div>

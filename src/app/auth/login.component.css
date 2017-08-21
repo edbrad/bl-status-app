@@ -14,8 +14,12 @@ body {
   bottom: 0;
   left: 0;
   width: 320px;
-  height: 280px;
+  height: 350px;
 }
 .align-center {
   text-align:center;
+}
+.message {
+  color: #a94442;
+  padding:5px;
 }
