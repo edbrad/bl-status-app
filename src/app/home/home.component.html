@@ -1,22 +1,71 @@
 <div class="container">
   <div class="starter-template">
     <h1>bl-status</h1>
-    <p class="lead">EMS Box loading Status Tracking System</p>
+    <p class="lead">EMS Box Loading Status Tracking System</p>
   </div>
-  <input type='text' style='padding:8px;margin:15px auto;width:30%;' placeholder='Type to filter the pattern column...' (keyup)='updateFilter($event)'
+  <input type='text' style='padding:8px;margin:15px auto;width:30%;' placeholder='Type to filter the pattern column...' (keyup)='updatePatternFilter($event)'
   />
   <div>
-    <ngx-datatable class="material"
-      #table
-      [rows]="rows"
-      [columns]="columns"
-      [columnMode]="'force'"
-      [sortType]="'multi'"
-      [headerHeight]="50"
-      [footerHeight]="50"
-      [rowHeight]="'auto'"
-      [limit]="10">
-      >
+    <ngx-datatable class="material expandable" #homeTable [rows]="rows" [columns]="columns" [columnMode]="'force'" [sortType]="'multi'"
+      [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [limit]="10">
+      <!-- Row Detail Template -->
+      <ngx-datatable-row-detail [rowHeight]="100" #myDetailRow (toggle)="onDetailToggle($event)">
+        <ng-template let-row="row" let-expanded="expanded" ngx-datatable-row-detail-template>
+          <div style="padding-left:35px;">
+            <div><strong>Pattern Details:</strong></div>
+            <table class="table table-condensed table-bordered">
+              <tr>
+                <td class="col-md-2 col-sm-1"><b>Client:</b></td>
+                <td class="col-md-4 col-sm-2">{{row.client}}</td>
+                <td class="col-md-2 col-sm-1"><b>Piece Specs:</b></td>
+                <td class="col-md-4 col-sm-2">{{row.Specs}}</td>
+              </tr>
+            </table>
+          </div>
+        </ng-template>
+      </ngx-datatable-row-detail>
+      <!-- Column Templates -->
+      <ngx-datatable-column [width]="50" [resizeable]="false" [sortable]="false" [draggable]="false" [canAutoResize]="false">
+        <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+          <a [class.datatable-icon-right]="!expanded" [class.datatable-icon-down]="expanded" title="Expand/Collapse Row" (click)="toggleExpandRow(row)">
+        </a>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Pattern" >
+        <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+          <strong>{{row.pattern}}</strong>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Project" >
+        <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+          {{row.project}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Mail Class">
+        <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+          {{row.mailClass}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Sample Status">
+        <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+          {{row.sampleStatus}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Paperwork Status">
+        <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+          {{row.paperworkStatus}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Piece Type">
+        <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+          {{row.type}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Drop Date">
+        <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+          {{row.dropDate}}
+        </ng-template>
+      </ngx-datatable-column>
     </ngx-datatable>
   </div>
 </div>

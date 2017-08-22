@@ -11,6 +11,7 @@ import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { routing } from './app.routing';
 import { AppComponent } from './app.component';
 import { AuthenticationService } from './auth/auth.service';
+import { DataService } from './data.service';
 import { AuthGuard } from './auth/authguard';
 import { NavComponent } from './nav/nav.component';
 import { FooterComponent } from './footer/footer.component';
@@ -51,6 +52,7 @@ import { AdminComponent } from './admin/admin.component';
   providers: [
     AuthGuard,
     AuthenticationService,
+    DataService,
   ],
   bootstrap: [AppComponent]
 })
