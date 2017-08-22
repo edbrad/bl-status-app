@@ -18,7 +18,7 @@ export class AuthenticationService {
   loggedInRoles: string[] = ['None'];   // the assinged role(s) of the current user
 
   /**
-   * Log into the application by posting username/password to the API and retrieving
+   * @description Log into the application by posting username/password to the API and retrieving
    * an authentication token
    * @param username
    * @param password
@@ -52,7 +52,7 @@ export class AuthenticationService {
   }
 
   /**
-   * clear all user info from local browser and application storage to log user out
+   * @description clear all user info from local browser and application storage to log user out
    */
   logout() {
     if (this.loggedIn == true) {
@@ -72,7 +72,10 @@ export class AuthenticationService {
     return this.loggedInUser
   }
 
-  /** verfy that the currently stored authentication token has not expired */
+  /**
+   * @description verfy that the currently stored authentication token has not expired
+   *
+   */
   checkExp(user: User) {
     return this.http.post(this.urlRoot + '/check-token-exp/', { user: user })
       .map((response: Response) => {

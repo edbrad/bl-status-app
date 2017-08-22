@@ -5,6 +5,7 @@ import { CollapseModule } from 'ngx-bootstrap';
 import { HttpModule } from '@angular/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
+import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 
 // custom app components
 import { routing } from './app.routing';
@@ -44,7 +45,8 @@ import { AdminComponent } from './admin/admin.component';
       timeOut: 5000,
       positionClass: 'toast-top-center',
       preventDuplicates: true,
-    })
+    }),
+    NgxDatatableModule
   ],
   providers: [
     AuthGuard,
