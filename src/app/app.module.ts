@@ -21,6 +21,7 @@ import { SampleroomComponent } from './sampleroom/sampleroom.component';
 import { PostalaccountingComponent } from './postalaccounting/postalaccounting.component';
 import { DropshippingComponent } from './dropshipping/dropshipping.component';
 import { AdminComponent } from './admin/admin.component';
+import { AddCommasPipe } from './add-commas.pipe';
 
 
 @NgModule({
@@ -33,7 +34,8 @@ import { AdminComponent } from './admin/admin.component';
     SampleroomComponent,
     PostalaccountingComponent,
     DropshippingComponent,
-    AdminComponent
+    AdminComponent,
+    AddCommasPipe
   ],
   imports: [
     BrowserModule,

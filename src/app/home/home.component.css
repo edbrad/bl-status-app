@@ -1,0 +1,33 @@
+/* NGX-DATATABLE */
+.sample-new{
+  background-color: white;
+}
+.sample-replacement{
+  background-color: yellow;
+}
+.sample-in-progress{
+  background-color: blue;
+}
+.sample-issue{
+  background-color: red;
+}
+.sample-complete{
+  background-color: green;
+}
+/**/
+.paperwork-new{
+  background-color: white;
+}
+.paperwork-replacement{
+  background-color: yellow;
+}
+.paperwork-in-progress{
+  background-color: blue;
+}
+.paperwork-issue{
+  background-color: red;
+}
+.paperwork-complete{
+  background-color: green;
+}
+

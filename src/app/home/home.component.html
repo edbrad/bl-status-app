@@ -6,13 +6,14 @@
   <input type='text' style='padding:8px;margin:15px auto;width:30%;' placeholder='Type to filter the pattern column...' (keyup)='updatePatternFilter($event)'
   />
   <div>
-    <ngx-datatable class="material expandable" #homeTable [rows]="rows" [columns]="columns" [columnMode]="'force'" [sortType]="'multi'"
-      [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [limit]="10">
-      <!-- Row Detail Template -->
-      <ngx-datatable-row-detail [rowHeight]="100" #myDetailRow (toggle)="onDetailToggle($event)">
+    <ngx-datatable  (page)="onPage($event)" class="material expandable" #homeTable [rows]="rows" [columns]="columns" [columnMode]="'force'" [sortType]="'multi'"
+      [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [limit]="10" [rowClass]="getRowClass">
+      <!-- Row Detail Template (expandable) -->
+      <ngx-datatable-row-detail [rowHeight]="250" #myDetailRow (toggle)="onDetailToggle($event)">
         <ng-template let-row="row" let-expanded="expanded" ngx-datatable-row-detail-template>
           <div style="padding-left:35px;">
-            <div><strong>Pattern Details:</strong></div>
+            <div><strong>PATTERN DETAILS:</strong> {{row.pattern}}</div>
+            <br>
             <table class="table table-condensed table-bordered">
               <tr>
                 <td class="col-md-2 col-sm-1"><b>Client:</b></td>
@@ -20,7 +21,28 @@
                 <td class="col-md-2 col-sm-1"><b>Piece Specs:</b></td>
                 <td class="col-md-4 col-sm-2">{{row.Specs}}</td>
               </tr>
+              <tr>
+                <td class="col-md-2 col-sm-1"><b>CAR-RT?:</b></td>
+                <td class="col-md-4 col-sm-2">{{row.hasCRRT}}</td>
+                <td class="col-md-2 col-sm-1"><b>Tray/Sack Max:</b></td>
+                <td class="col-md-4 col-sm-2">{{row.trayMax}}</td>
+              </tr>
+              <tr>
+                <td class="col-md-2 col-sm-1"><b>Internal Project ID:</b></td>
+                <td class="col-md-4 col-sm-2">{{row.projectID}}</td>
+                <td class="col-md-2 col-sm-1"><b>Internal Qual. ID:</b></td>
+                <td class="col-md-4 col-sm-2">{{row.qualID}}</td>
+              </tr>
+              <tr>
+                <td class="col-md-2 col-sm-1"><b>Single Piece Count:</b></td>
+                <td class="col-md-4 col-sm-2">{{row.spr}}</td>
+                <td class="col-md-2 col-sm-1"><b>Failed Piece Count:</b></td>
+                <td class="col-md-4 col-sm-2">{{row.fail}}</td>
+              </tr>
             </table>
+            <div>
+              <button (click)="printJobTicket()" style="margin-bottom: 10px; margin-left: 0px;" class="btn btn-success"><i class="fa fa-print"></i> Print Unofficial Job Ticket</button>
+            </div>
           </div>
         </ng-template>
       </ngx-datatable-row-detail>
@@ -31,12 +53,12 @@
         </a>
         </ng-template>
       </ngx-datatable-column>
-      <ngx-datatable-column name="Pattern" >
+      <ngx-datatable-column name="Pattern">
         <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
           <strong>{{row.pattern}}</strong>
         </ng-template>
       </ngx-datatable-column>
-      <ngx-datatable-column name="Project" >
+      <ngx-datatable-column name="Project">
         <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
           {{row.project}}
         </ng-template>
@@ -46,12 +68,12 @@
           {{row.mailClass}}
         </ng-template>
       </ngx-datatable-column>
-      <ngx-datatable-column name="Sample Status">
+      <ngx-datatable-column name="Sample Status" [cellClass]="getSampleCellClass">
         <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
           {{row.sampleStatus}}
         </ng-template>
       </ngx-datatable-column>
-      <ngx-datatable-column name="Paperwork Status">
+      <ngx-datatable-column name="Paperwork Status" [cellClass]="getPaperworkCellClass">
         <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
           {{row.paperworkStatus}}
         </ng-template>
@@ -59,6 +81,11 @@
       <ngx-datatable-column name="Piece Type">
         <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
           {{row.type}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Piece Count">
+        <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+          {{row.total | addCommas}}
         </ng-template>
       </ngx-datatable-column>
       <ngx-datatable-column name="Drop Date">
