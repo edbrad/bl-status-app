@@ -1,8 +1,12 @@
 declare var pdfMake: any; /** prevent TypeScript typings error when using non-TypeSCript Lib (pdfmake) */
 declare var moment: any;  /** prevent TypeScript typings error when using non-TypeSCript Lib (momentJS) */
+//
 import { Component, OnInit, ViewEncapsulation, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map'
+import { DaterangepickerConfig } from 'ng2-daterangepicker';
+import { DaterangePickerComponent } from 'ng2-daterangepicker';
+//
 import { DataService } from '../data.service';
 import { ToastrService } from 'ngx-toastr';
 
@@ -14,13 +18,35 @@ import { ToastrService } from 'ngx-toastr';
 })
 export class HomeComponent implements OnInit {
 
+  // misc variables
+  logoImagePath: string = "../assets/EMS_Envelope_T.png";
+  filterText: string = null;
+
+  // datepicker - date range (ng2-daterangepicker)
+  @ViewChild(DaterangePickerComponent)
+  private picker: DaterangePickerComponent;
+  public daterange: any = {};
+  public selectedDate(value: any, datepicker?: any) {
+      // this is the date the iser selected
+      console.log("date value: " + JSON.stringify(value));
+
+      // any object can be passed to the selected event and it will be passed back here
+      datepicker.start = value.start;
+      datepicker.end = value.end;
+
+      // or manupulat your own internal property
+      this.daterange.start = value.start;
+      this.daterange.end = value.end;
+      this.daterange.label = value.label;
+  }
+
   // data-table variables (ngx-datatable)
   rows: any[] = [];
   temp = [];
   data = [];
   expanded: any = {};
   timeout: any;
-  @ViewChild('homeTable') table: any; // table html reference
+  @ViewChild('homeTable') table: any; /** data table html reference */
 
   // job ticket (PDF) variables (pdfmake)
   pdf: any;                 /** pointer to pdfmake javascript library */
@@ -34,16 +60,47 @@ export class HomeComponent implements OnInit {
   jobPatterns: any[] = [];  /** the pattern details for the given Job */
   totalQty: number = 0;     /** total pieces */
 
-  constructor(private ds: DataService, private toastr: ToastrService) {
-    this.temp = this.rows;
+  /**
+   * @constructor
+   * @param ds data service dependency (makes REST API calls)
+   * @param toastr pop-up notification dependency
+   */
+  constructor(private ds: DataService, private toastr: ToastrService,
+    private daterangepickerOptions: DaterangepickerConfig) {
+      this.daterangepickerOptions.settings = {
+        locale: { format: 'MM/DD/YYYY' },
+        alwaysShowCalendars: false,
+        ranges: {
+          'Last Month': [moment().subtract(1, 'month'), moment()],
+          'Last 3 Months': [moment().subtract(4, 'month'), moment()],
+          'Last 6 Months': [moment().subtract(6, 'month'), moment()],
+          'Last 12 Months': [moment().subtract(12, 'month'), moment()],
+       },
+       startDate: moment().subtract(1, 'month'),
+       endDate: moment()
+    };
   }
 
+  /**
+   * @method ngOnInit
+   * @description initialize component
+   */
   ngOnInit() {
-    /** get all statuses from the external REST API */
+    // get all statuses from the external REST API
     this.ds.getAllStatuses().subscribe((data => {
       this.rows = data;
+      // cache data for filtering
       this.temp = [...data];
     }));
+  }
+
+  isComplete(sampleStatus: string, paperworkStatus: string){
+    if(sampleStatus == "Complete" && paperworkStatus == "Complete"){
+      return true;
+    }
+    else{
+      return false;
+    }
   }
 
   /**
@@ -53,44 +110,85 @@ export class HomeComponent implements OnInit {
    */
   updatePatternFilter(event) {
     const val = event.target.value.toLowerCase();
-
     // filter our data
     const temp = this.temp.filter(function (d) {
       return d.pattern.toLowerCase().indexOf(val) !== -1 || !val;
     });
-
     // update the rows
     this.rows = temp;
-    // Whenever the filter changes, always go back to the first page
+    // whenever the filter changes, always go back to the first page
     this.table.offset = 0;
-
   }
 
+  /**
+   *
+   */
+  refreshStatusData() {
+    // get all statuses from the external REST API
+    this.ds.getAllStatuses().subscribe((data => {
+      this.rows = data;
+      // cache data for filtering
+      this.temp = [...data];
+      if (this.filterText != null) {
+        const val = this.filterText.toLocaleLowerCase();
+        const temp = this.temp.filter(function (d) {
+          return d.pattern.toLowerCase().indexOf(val) !== -1 || !val;
+        });
+        // update the rows
+        this.rows = temp;
+        // whenever the filter changes, always go back to the first page
+        this.table.offset = 0;
+      }
+    }));
+  }
+
+  /**
+   * @method onPage
+   * @description capture data-table paging events
+   * @param event
+   */
   onPage(event) {
     clearTimeout(this.timeout);
     this.timeout = setTimeout(() => {
     }, 100);
   }
 
+  /**
+   * @method toggleExpandRow
+   * @description toggle selected row detail view open and closed
+   * @param row the selected row
+   */
   toggleExpandRow(row) {
     this.table.rowDetail.toggleExpandRow(row);
   }
 
+  /**
+   * @method onDetailToggle
+   * @description capture row detail toggle event
+   * @param event the given toggle even
+   */
   onDetailToggle(event) {
+    // TODO:???
   }
 
   /**
    * @method printJobTicket
    * @description generate a PDF of the EMS Job Ticket (using pdfMake Library)
+   * @param pattern the selected pattern
    */
-  private printJobTicket() {
+  private printJobTicket(pattern: string) {
     this.aClient = "sample";
-    var pattern = "3344-01A"
+    // trim off pattern code ( = Job Number)
     this.jobNumber = pattern.substring(0, pattern.length - 1);
     this.pdf = pdfMake;
 
     /** get a job from the external REST API */
     this.ds.getAJob(this.jobNumber).subscribe((data => {
+      // skip generation processing if there is no Job Ticket data
+      if (data.length == 0) {
+        this.toastr.error('Job Ticket Not Found!', 'bl-status: Data Service');
+        return;
+      }
       this.job = data;
       this.aJob = this.job[0];
       this.company = this.job[0].Company;
@@ -128,7 +226,7 @@ export class HomeComponent implements OnInit {
   }
 
   /**
-   * @function buildJobTicketPdf
+   * @method buildJobTicketPdf
    * @description build dynamic Job Ticket PDF layout object for the pdfMake rendering method (createPdf)
    * @param {string} company - the given Company name (for Header/Footer dynamic content)
    * @param {string} jobNumber - the given Job Number (for Header/Footer dynamic content)
@@ -280,7 +378,7 @@ export class HomeComponent implements OnInit {
   }
 
   /**
-   * @function buildJobTicketBody
+   * @method buildJobTicketBody
    * @description build dynamic Job Ticket PDF layout object
    * @returns {array} a collection of dynamic PDF layout parameters
    */
@@ -321,7 +419,7 @@ export class HomeComponent implements OnInit {
   }
 
   /**
-   * @function buildPatternBody
+   * @method buildPatternBody
    * @returns {array} a collection of dynamic PDF layout parameters
    */
   private buildPatternBody() {
@@ -439,7 +537,7 @@ export class HomeComponent implements OnInit {
   }
 
   /**
-   * @function buildDepartmentBody
+   * @method buildDepartmentBody
    * @description build Departmental instuction table
    * @returns {array} a collection of dynamic PDF layout parameters
    */
@@ -460,7 +558,7 @@ export class HomeComponent implements OnInit {
   }
 
   /**
-   * @function buildMailPieceBody
+   * @method buildMailPieceBody
    * @description dynamically build an array containing the data to be displayed in
    * the Mail Piece Component table section
    * @param {any} pat - Pattern/Details object to be formatted as part of the PDF
@@ -778,7 +876,7 @@ export class HomeComponent implements OnInit {
   }
 
   /**
-   * @function getPatQty
+   * @method getPatQty
    * @description get the number of pieces for a given pattern
    * @param {string} pattern - the given pattern code
    * @returns {number} the number of pieces tallyed
@@ -807,7 +905,7 @@ export class HomeComponent implements OnInit {
   }
 
   /**
-   * @function formatUsPhone
+   * @method formatUsPhone
    * @description Reformat phone data into the US Phone Number format/style
    * @param {string} phone - phone number to be reformatted
    * @returns {string} the reformatted phone number
@@ -829,7 +927,7 @@ export class HomeComponent implements OnInit {
   }
 
   /**
-   * @function formatUsZipCode
+   * @method formatUsZipCode
    * @description reformat zip code data into US Zip Code format/style
    * @param {string} zip - the Zip Code to be reformatted
    * @returns {string} the reformatted Zip Code
@@ -848,7 +946,7 @@ export class HomeComponent implements OnInit {
   }
 
   /**
-   * @function formatUsDate
+   * @method formatUsDate
    * @description use momemtJS to format a date into yy/mm/dd
    * @param {string} x the Date to be reformatted
    * @returns {string} the formatted date
@@ -858,7 +956,7 @@ export class HomeComponent implements OnInit {
   }
 
   /**
-   * @function addCommas
+   * @method addCommas
    * @description reformatts a number by adding colums for thousands deliniation
    * @param {number} intNum the number to add commas to
    * @returns {string} the formatted number with commas (US Style)
@@ -873,6 +971,7 @@ export class HomeComponent implements OnInit {
    * @param row current table row
    * @param column currrent table column
    * @param value current cell value
+   * @returns object class containing css classes to be applied based on value
    */
   private getSampleCellClass({ row, column, value }): any {
     return {
@@ -890,6 +989,7 @@ export class HomeComponent implements OnInit {
    * @param row current table row
    * @param column currrent table column
    * @param value current cell value
+   * @returns object class containing css classes to be applied based on value
    */
   private getPaperworkCellClass({ row, column, value }): any {
     return {

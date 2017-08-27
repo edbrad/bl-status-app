@@ -2,6 +2,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CollapseModule } from 'ngx-bootstrap';
+import { Daterangepicker } from 'ng2-daterangepicker';
 import { HttpModule } from '@angular/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
@@ -49,7 +50,8 @@ import { AddCommasPipe } from './add-commas.pipe';
       positionClass: 'toast-top-center',
       preventDuplicates: true,
     }),
-    NgxDatatableModule
+    NgxDatatableModule,
+    Daterangepicker
   ],
   providers: [
     AuthGuard,

@@ -6,7 +6,7 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a [routerLink]="['/']" class="navbar-brand">bl-status</a>
+      <a style="font-size: 1.5em;margin-top:-2px;color:beige" [routerLink]="['/']" class="navbar-brand"><b>bl-status:</b></a>
     </div>
     <div class="collapse navbar-collapse" id="bl-statusNavBar" [collapse]="isCollapsed">
       <ul class="nav navbar-nav" role="navigation">
@@ -18,11 +18,11 @@
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li><a *ngIf="!this.authenticationService.isLoggedIn()" class="log-li"
-          [routerLink]="['/login']"><span class="glyphicon glyphicon-log-in log-li"></span> Log In </a>
+          [routerLink]="['/login']"><span class="log-li"></span><i class="fa fa-sign-in" aria-hidden="true"></i> Log In </a>
         </li>
-        <li><a *ngIf="this.authenticationService.isLoggedIn()" class="log-li"
-          (click)="this.authenticationService.logout()" [routerLink]="['/home']"><span class="glyphicon glyphicon-log-out log-li">
-            </span> Log Out: {{this.authenticationService.getUsername()}} </a>
+        <li><a *ngIf="this.authenticationService.isLoggedIn()" class="log-li" style="color:greenyellow;"
+          (click)="this.authenticationService.logout()" [routerLink]="['/home']"><span class="log-li">
+            </span><i class="fa fa-sign-out" aria-hidden="true"></i> Log Out: {{this.authenticationService.getUsername()}} </a>
         </li>
       </ul>
     </div>
