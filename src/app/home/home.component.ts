@@ -275,6 +275,7 @@ export class HomeComponent implements OnInit {
       this.rows = completeFilter;
       // whenever the filter changes, always go back to the first page
       this.table.offset = 0;
+      this.lastRefreshDate = moment();
     }));
   }
 
