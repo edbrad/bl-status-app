@@ -21,6 +21,11 @@ export class HomeComponent implements OnInit {
   // misc variables
   logoImagePath: string = "../assets/EMS_Envelope_T.png";
   filterText: string = null;
+  isLetterFilterChecked: boolean = false;
+  isFlatFilterChecked: boolean = false;
+  isCompleteFilterChecked: boolean = false;
+  lastRefreshDate: Date = moment();
+
 
   // datepicker - date range (ng2-daterangepicker)
   @ViewChild(DaterangePickerComponent)
@@ -38,6 +43,9 @@ export class HomeComponent implements OnInit {
       this.daterange.start = value.start;
       this.daterange.end = value.end;
       this.daterange.label = value.label;
+
+      // refresh data
+      this.refreshStatusData();
   }
 
   // data-table variables (ngx-datatable)
@@ -68,7 +76,7 @@ export class HomeComponent implements OnInit {
   constructor(private ds: DataService, private toastr: ToastrService,
     private daterangepickerOptions: DaterangepickerConfig) {
       this.daterangepickerOptions.settings = {
-        locale: { format: 'MM/DD/YYYY' },
+        locale: { format: 'MM/DD/YY' },
         alwaysShowCalendars: false,
         ranges: {
           'Last Month': [moment().subtract(1, 'month'), moment()],
@@ -86,14 +94,56 @@ export class HomeComponent implements OnInit {
    * @description initialize component
    */
   ngOnInit() {
-    // get all statuses from the external REST API
-    this.ds.getAllStatuses().subscribe((data => {
-      this.rows = data;
-      // cache data for filtering
-      this.temp = [...data];
-    }));
+    // set date range
+    this.daterange.start = moment().subtract(1, 'month');
+    this.daterange.end = moment();
+    // get latest status data
+    this.refreshStatusData();
   }
 
+  /**
+   * @method checkLettersFilter
+   * @description respond to letter checkbox filter -  check event
+   * @param  $event check event
+   */
+  checkLettersFilter($event){
+    this.isLetterFilterChecked = !this.isLetterFilterChecked;
+    if (this.isFlatFilterChecked){
+      this.isFlatFilterChecked = false;
+    }
+    this.refreshStatusData();
+  }
+
+  /**
+   * @method checkLettersFilter
+   * @description respond to flat checkbox filter -  check event
+   * @param  $event check event
+   */
+  checkFlatsFilter($event){
+    this.isFlatFilterChecked = !this.isFlatFilterChecked;
+    if (this.isLetterFilterChecked){
+      this.isLetterFilterChecked = false;
+    }
+    this.refreshStatusData();
+  }
+
+  /**
+   * @method checkCompleteFilter
+   * @description respond to flat checkbox filter -  check event
+   * @param  $event check event
+   */
+  checkCompleteFilter($event){
+    this.isCompleteFilterChecked = !this.isCompleteFilterChecked;
+    this.refreshStatusData();
+  }
+
+  /**
+   * @method isConplete
+   * @description determine if all tasks are done (sample & paperwork)
+   * @param sampleStatus
+   * @param paperworkStatus
+   * @returns true/false
+   */
   isComplete(sampleStatus: string, paperworkStatus: string){
     if(sampleStatus == "Complete" && paperworkStatus == "Complete"){
       return true;
@@ -114,31 +164,117 @@ export class HomeComponent implements OnInit {
     const temp = this.temp.filter(function (d) {
       return d.pattern.toLowerCase().indexOf(val) !== -1 || !val;
     });
+    this.refreshStatusData();
     // update the rows
-    this.rows = temp;
+    //this.rows = temp;
     // whenever the filter changes, always go back to the first page
     this.table.offset = 0;
   }
 
   /**
-   *
+   * @method refreshStatusData
+   * @description get latest status data from the database and apply any
+   * existing filters
    */
   refreshStatusData() {
     // get all statuses from the external REST API
+    var textFilter: any[] = [];
+    var dateFilter: any[] = [];
+    var pieceFilter: any[] = [];
+    var completeFilter: any[] = [];
     this.ds.getAllStatuses().subscribe((data => {
       this.rows = data;
       // cache data for filtering
       this.temp = [...data];
+      // filter pattern
       if (this.filterText != null) {
+        //console.log("YES pattern filter!")
         const val = this.filterText.toLocaleLowerCase();
-        const temp = this.temp.filter(function (d) {
+        textFilter = this.temp.filter(function (d) {
           return d.pattern.toLowerCase().indexOf(val) !== -1 || !val;
         });
-        // update the rows
-        this.rows = temp;
-        // whenever the filter changes, always go back to the first page
-        this.table.offset = 0;
       }
+      else{
+        //console.log("NO pattern filter!")
+        textFilter = [...this.temp];
+      }
+      //console.log("textFilter: " + JSON.stringify(textFilter));
+
+      // filter date
+      if (this.daterange.start && this.daterange.end) {
+        //console.log("YES date filter!")
+        var s = this.daterange.start;
+        var e = this.daterange.end;
+        dateFilter = textFilter.filter(function (d) {
+          var date = moment(d.dropDate, "MM/DD/YY");
+          var startDate = moment(s, "MM/DD/YY");
+          var endDate = moment(e, "MM/DD/YY");
+          if (date.isBefore(endDate)
+            && date.isAfter(startDate)
+            || (date.isSame(startDate) || date.isSame(endDate))) {
+            return true;
+          } else {
+            return false;
+          }
+        });
+      }
+      else {
+        //console.log("NO date filter!")
+        dateFilter = [...textFilter]
+      }
+      //console.log("dateFilter: " + JSON.stringify(dateFilter));
+
+      // filter piece
+      if (this.isLetterFilterChecked && !this.isFlatFilterChecked) {
+        //console.log("YES Letter filter!")
+        pieceFilter = dateFilter.filter(function (d) {
+          if (d.type == "Letter") {
+            return true;
+          }
+          else {
+            return false;
+          }
+        });
+      }
+      else if (this.isFlatFilterChecked && !this.isLetterFilterChecked) {
+        //console.log("YES Flat filter!")
+        pieceFilter = dateFilter.filter(function (d) {
+          if (d.type == "Flat") {
+            return true;
+          }
+          else {
+            return false;
+          }
+        });
+      }
+      else {
+        //console.log("NO Flat filter!")
+        pieceFilter = [...dateFilter]
+      }
+      //console.log("pieceFilter: " + JSON.stringify(pieceFilter));
+
+      // filter complete
+      if(this.isCompleteFilterChecked){
+        //console.log("YES Complete filter!")
+        completeFilter = [...pieceFilter]
+        completeFilter = pieceFilter.filter(function (d) {
+          if (d.sampleStatus == "Complete" && d.paperworkStatus == "Complete") {
+            return true;
+          }
+          else {
+            return false;
+          }
+        });
+      }
+      else{
+        //console.log("NO Complete filter!")
+        completeFilter = [...pieceFilter]
+      }
+      //console.log("completeFilter: " + JSON.stringify(completeFilter));
+      // update the rows
+      this.rows = completeFilter;
+      // whenever the filter changes, always go back to the first page
+      this.table.offset = 0;
     }));
   }
 
