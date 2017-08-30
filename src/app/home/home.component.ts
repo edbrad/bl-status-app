@@ -26,6 +26,43 @@ export class HomeComponent implements OnInit {
   isCompleteFilterChecked: boolean = false;
   lastRefreshDate: Date = moment();
 
+  // ChartJS parameters
+  public lineChartLegend: boolean = true;
+  public lineChartType: string = 'line';
+  public lineChartData: Array<any> = [
+    { data: [20, 21, 28, 32, 16, 34, 15], label: 'Patterns' },
+    { data: [2892451, 1189472, 789301, 689234, 2127562, 978301, 393781], label: 'Pieces' },
+  ];
+  public lineChartLabels: Array<any> = ['Today', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'];
+  public lineChartOptions: any = {
+    responsive: true
+  };
+  public lineChartColors: Array<any> = [
+    { // grey
+      backgroundColor: 'rgba(148,159,177,0.2)',
+      borderColor: 'rgba(148,159,177,1)',
+      pointBackgroundColor: 'rgba(148,159,177,1)',
+      pointBorderColor: '#fff',
+      pointHoverBackgroundColor: '#fff',
+      pointHoverBorderColor: 'rgba(148,159,177,0.8)'
+    },
+    { // dark grey
+      backgroundColor: 'rgba(77,83,96,0.2)',
+      borderColor: 'rgba(77,83,96,1)',
+      pointBackgroundColor: 'rgba(77,83,96,1)',
+      pointBorderColor: '#fff',
+      pointHoverBackgroundColor: '#fff',
+      pointHoverBorderColor: 'rgba(77,83,96,1)'
+    },
+    { // grey
+      backgroundColor: 'rgba(148,159,177,0.2)',
+      borderColor: 'rgba(148,159,177,1)',
+      pointBackgroundColor: 'rgba(148,159,177,1)',
+      pointBorderColor: '#fff',
+      pointHoverBackgroundColor: '#fff',
+      pointHoverBorderColor: 'rgba(148,159,177,0.8)'
+    }
+  ];
 
   // datepicker - date range (ng2-daterangepicker)
   @ViewChild(DaterangePickerComponent)
@@ -50,7 +87,8 @@ export class HomeComponent implements OnInit {
 
   // data-table variables (ngx-datatable)
   rows: any[] = [];
-  temp = [];
+  temp = []
+  temp2 = [];
   data = [];
   expanded: any = {};
   timeout: any;
@@ -99,6 +137,51 @@ export class HomeComponent implements OnInit {
     this.daterange.end = moment();
     // get latest status data
     this.refreshStatusData();
+  }
+
+  /**
+   * @method buildPiecePatternChart
+   * @description collect data for 7-day Piece/Pattern Drop Chart
+   */
+  buildPiecePatternChart(){
+    var days: Array<any> = [];
+    var dayLabels: Array<any> = [];
+    var dayPieces: Array<any> = [];
+    var pieces: Array<any> = [0,0,0,0,0,0,0];
+    var patterns: Array<any> = [0,0,0,0,0,0,0];
+    // get date range (7 days).
+    days[0] = moment();
+    days[1] = moment().add(1, 'days');
+    days[2] = moment().add(2, 'days');
+    days[3] = moment().add(3, 'days');
+    days[4] = moment().add(4, 'days');
+    days[5] = moment().add(5, 'days');
+    days[6] = moment().add(6, 'days');
+    // get patterns for each day in range
+    for (var i = 0; i < 7; i++) {
+      dayPieces = this.temp2.filter(function (d) {
+        var momentA = moment(days[i]).format("MM/DD/YY");
+        var momentB = moment(d.dropDate).format("MM/DD/YY");
+        if (momentA == momentB) {
+          return true;
+        }
+        else {
+          return false;
+        }
+      });
+      // tally piece amounts for each day
+      for (var j = 0; j < dayPieces.length; j++) {
+        pieces[i] += parseInt(dayPieces[j].total);
+        patterns[i] += 1;
+      }
+    }
+    for(var k = 0; k < days.length; k++){
+      dayLabels[k] = moment(days[k]).format("MM/DD");
+    }
+    // apply data to chart
+    this.lineChartData[0] = {data: patterns, label: "Pattern Count" };
+    this.lineChartData[1] = {data: pieces, label: "Piece Count"};
+    this.lineChartLabels = dayLabels;
   }
 
   /**
@@ -183,26 +266,26 @@ export class HomeComponent implements OnInit {
     var pieceFilter: any[] = [];
     var completeFilter: any[] = [];
     this.ds.getAllStatuses().subscribe((data => {
+      // save data from database
       this.rows = data;
       // cache data for filtering
       this.temp = [...data];
-      // filter pattern
+      this.temp2 = [...data];
+
+      // filter pattern code
       if (this.filterText != null) {
-        //console.log("YES pattern filter!")
         const val = this.filterText.toLocaleLowerCase();
         textFilter = this.temp.filter(function (d) {
           return d.pattern.toLowerCase().indexOf(val) !== -1 || !val;
         });
       }
       else{
-        //console.log("NO pattern filter!")
+        // pass-through - no filter needed
         textFilter = [...this.temp];
       }
-      //console.log("textFilter: " + JSON.stringify(textFilter));
 
-      // filter date
+      // filter drop date
       if (this.daterange.start && this.daterange.end) {
-        //console.log("YES date filter!")
         var s = this.daterange.start;
         var e = this.daterange.end;
         dateFilter = textFilter.filter(function (d) {
@@ -219,14 +302,13 @@ export class HomeComponent implements OnInit {
         });
       }
       else {
-        //console.log("NO date filter!")
+        // pass-through - no filter needed
         dateFilter = [...textFilter]
       }
-      //console.log("dateFilter: " + JSON.stringify(dateFilter));
 
-      // filter piece
+      // filter piece type
       if (this.isLetterFilterChecked && !this.isFlatFilterChecked) {
-        //console.log("YES Letter filter!")
+
         pieceFilter = dateFilter.filter(function (d) {
           if (d.type == "Letter") {
             return true;
@@ -237,7 +319,6 @@ export class HomeComponent implements OnInit {
         });
       }
       else if (this.isFlatFilterChecked && !this.isLetterFilterChecked) {
-        //console.log("YES Flat filter!")
         pieceFilter = dateFilter.filter(function (d) {
           if (d.type == "Flat") {
             return true;
@@ -248,14 +329,12 @@ export class HomeComponent implements OnInit {
         });
       }
       else {
-        //console.log("NO Flat filter!")
+        // pass-through - no filter needed
         pieceFilter = [...dateFilter]
       }
-      //console.log("pieceFilter: " + JSON.stringify(pieceFilter));
 
-      // filter complete
+      // filter complete status
       if(this.isCompleteFilterChecked){
-        //console.log("YES Complete filter!")
         completeFilter = [...pieceFilter]
         completeFilter = pieceFilter.filter(function (d) {
           if (d.sampleStatus == "Complete" && d.paperworkStatus == "Complete") {
@@ -267,15 +346,19 @@ export class HomeComponent implements OnInit {
         });
       }
       else{
-        //console.log("NO Complete filter!")
+        // pass-through - no filter needed
         completeFilter = [...pieceFilter]
       }
-      //console.log("completeFilter: " + JSON.stringify(completeFilter));
-      // update the rows
+
+      // finally, update the rows to be displayed
       this.rows = completeFilter;
+
       // whenever the filter changes, always go back to the first page
       this.table.offset = 0;
       this.lastRefreshDate = moment();
+
+      // build chart data
+      this.buildPiecePatternChart();
     }));
   }
 
