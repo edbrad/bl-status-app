@@ -2,13 +2,17 @@ import { Injectable } from '@angular/core';
 import { Http, Headers, Response } from '@angular/http';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map'
-import { User } from './user'
+//
 import { ToastrService } from 'ngx-toastr';
+//
+import { User } from './user'
+
 
 @Injectable()
 export class AuthenticationService {
 
-  constructor(private http: Http, private toastr: ToastrService) { }
+  constructor(private http: Http,
+    private toastr: ToastrService) { }
 
   // API endpoint root URL
   urlRoot: string = 'http://172.16.248.19:8080/api'; // test
@@ -57,6 +61,7 @@ export class AuthenticationService {
   logout() {
     if (this.loggedIn == true) {
       this.toastr.warning('Logged Out!', 'bl-status: Authentication Service');
+
     }
     this.loggedIn = false;
     this.loggedInUser = "";

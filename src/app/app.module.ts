@@ -15,6 +15,7 @@ import { ChartsModule } from 'ng2-charts';
 import { AuthenticationService } from './auth/auth.service';
 import { AuthGuard } from './auth/authguard';
 import { DataService } from './data.service';
+import { LoggingService } from './logging.service';
 
 // custom components
 import { routing } from './app.routing';
@@ -58,12 +59,13 @@ import { AddCommasPipe } from './add-commas.pipe';
     }),
     NgxDatatableModule,
     Daterangepicker,
-    ChartsModule
+    ChartsModule,
   ],
   providers: [
     AuthGuard,
     AuthenticationService,
     DataService,
+    LoggingService,
   ],
   bootstrap: [AppComponent]
 })

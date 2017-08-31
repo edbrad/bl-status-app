@@ -1,11 +1,14 @@
+declare var moment: any;  /** prevent TypeScript typings error when using non-TypeSCript Lib (momentJS) */
 import { Injectable } from '@angular/core';
 import { Http, Response } from '@angular/http';
 import 'rxjs/Rx';
+//
+import { AuthenticationService } from './auth/auth.service';
 
 @Injectable()
 export class DataService {
 
-  constructor(private http: Http) { }
+  constructor(private http: Http, private authenticationService: AuthenticationService) { }
 
   // bl-status API endpoint root URL
   urlRoot: string = 'http://172.16.248.19:8080/api'; // test
@@ -66,4 +69,5 @@ export class DataService {
     return this.http.get(url)
       .map((response: Response) => response.json());
   }
+
 }

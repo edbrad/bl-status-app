@@ -4,11 +4,13 @@ declare var moment: any;  /** prevent TypeScript typings error when using non-Ty
 import { Component, OnInit, ViewEncapsulation, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map'
+//
 import { DaterangepickerConfig } from 'ng2-daterangepicker';
 import { DaterangePickerComponent } from 'ng2-daterangepicker';
+import { ToastrService } from 'ngx-toastr';
 //
 import { DataService } from '../data.service';
-import { ToastrService } from 'ngx-toastr';
+import { LoggingService } from '../logging.service';
 
 @Component({
   selector: 'app-home',
@@ -69,14 +71,14 @@ export class HomeComponent implements OnInit {
   private picker: DaterangePickerComponent;
   public daterange: any = {};
   public selectedDate(value: any, datepicker?: any) {
-      // this is the date the iser selected
-      console.log("date value: " + JSON.stringify(value));
+      // this is the date the user selected
+      //console.log("date value: " + JSON.stringify(value));
 
       // any object can be passed to the selected event and it will be passed back here
       datepicker.start = value.start;
       datepicker.end = value.end;
 
-      // or manupulat your own internal property
+      // or manupulate internal property
       this.daterange.start = value.start;
       this.daterange.end = value.end;
       this.daterange.label = value.label;
@@ -111,12 +113,18 @@ export class HomeComponent implements OnInit {
    * @param ds data service dependency (makes REST API calls)
    * @param toastr pop-up notification dependency
    */
-  constructor(private ds: DataService, private toastr: ToastrService,
+  constructor(private ds: DataService,
+    private toastr: ToastrService,
+    private logger: LoggingService,
     private daterangepickerOptions: DaterangepickerConfig) {
+      // initialize DatePicker (for drop date range filter)
       this.daterangepickerOptions.settings = {
         locale: { format: 'MM/DD/YY' },
         alwaysShowCalendars: false,
         ranges: {
+          'Today':[moment(), moment()],
+          'This Week':[moment(), moment().add(6, 'days')],
+          'This Month': [moment(), moment().subtract(1, 'months')],
           'Last Month': [moment().subtract(1, 'month'), moment()],
           'Last 3 Months': [moment().subtract(4, 'month'), moment()],
           'Last 6 Months': [moment().subtract(6, 'month'), moment()],
@@ -137,6 +145,13 @@ export class HomeComponent implements OnInit {
     this.daterange.end = moment();
     // get latest status data
     this.refreshStatusData();
+    // log the event
+    this.logger.addToLog("INFO", "Home Component activated.").subscribe((data => {
+      const ack = data;
+      if (!ack){
+        this.toastr.error('Logging Error!', 'bl-status: Logging Service');
+      }
+    }));
   }
 
   /**
@@ -179,6 +194,9 @@ export class HomeComponent implements OnInit {
       dayLabels[k] = moment(days[k]).format("MM/DD");
     }
     // apply data to chart
+    //dayLabels.unshift(" ");
+    //patterns.unshift("patterns: ");
+    //pieces.unshift("pieces: ")
     this.lineChartData[0] = {data: patterns, label: "Pattern Count" };
     this.lineChartData[1] = {data: pieces, label: "Piece Count"};
     this.lineChartLabels = dayLabels;

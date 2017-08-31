@@ -1,6 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+//
+import { ToastrService } from 'ngx-toastr';
+//
 import { AuthenticationService } from '../auth/auth.service';
+import { LoggingService } from '../logging.service';
 
 @Component({
   selector: 'app-nav',
@@ -15,15 +19,18 @@ export class NavComponent implements OnInit {
 
   logInText = "&nbsp;&nbsp Log In";
 
-  constructor(private router: Router, private authenticationService: AuthenticationService) {
+  constructor(private router: Router,
+    private authenticationService: AuthenticationService,
+    private logger: LoggingService,
+    private toastr: ToastrService) {
     console.log("logged in: " + this.loggedIn);
   }
 
   logout(){
     this.authenticationService.logout();
+    console.log("after logout")
     this.router.navigate(['/home']);
   }
-
 
   ngOnInit() {
   }
