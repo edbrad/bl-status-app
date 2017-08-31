@@ -29,7 +29,7 @@ export class LoggingService {
       {
         timeStamp: moment().format(),
         user: user,
-        ip_address: "", // populated by API
+        ipAddress: "", // populated by API
         level: level,
         message: message
       })

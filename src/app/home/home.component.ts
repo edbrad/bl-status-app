@@ -71,20 +71,20 @@ export class HomeComponent implements OnInit {
   private picker: DaterangePickerComponent;
   public daterange: any = {};
   public selectedDate(value: any, datepicker?: any) {
-      // this is the date the user selected
-      //console.log("date value: " + JSON.stringify(value));
+    // this is the date the user selected
+    //console.log("date value: " + JSON.stringify(value));
 
-      // any object can be passed to the selected event and it will be passed back here
-      datepicker.start = value.start;
-      datepicker.end = value.end;
+    // any object can be passed to the selected event and it will be passed back here
+    datepicker.start = value.start;
+    datepicker.end = value.end;
 
-      // or manupulate internal property
-      this.daterange.start = value.start;
-      this.daterange.end = value.end;
-      this.daterange.label = value.label;
+    // or manupulate internal property
+    this.daterange.start = value.start;
+    this.daterange.end = value.end;
+    this.daterange.label = value.label;
 
-      // refresh data
-      this.refreshStatusData();
+    // refresh data
+    this.refreshStatusData();
   }
 
   // data-table variables (ngx-datatable)
@@ -117,21 +117,21 @@ export class HomeComponent implements OnInit {
     private toastr: ToastrService,
     private logger: LoggingService,
     private daterangepickerOptions: DaterangepickerConfig) {
-      // initialize DatePicker (for drop date range filter)
-      this.daterangepickerOptions.settings = {
-        locale: { format: 'MM/DD/YY' },
-        alwaysShowCalendars: false,
-        ranges: {
-          'Today':[moment(), moment()],
-          'This Week':[moment(), moment().add(6, 'days')],
-          'This Month': [moment(), moment().subtract(1, 'months')],
-          'Last Month': [moment().subtract(1, 'month'), moment()],
-          'Last 3 Months': [moment().subtract(4, 'month'), moment()],
-          'Last 6 Months': [moment().subtract(6, 'month'), moment()],
-          'Last 12 Months': [moment().subtract(12, 'month'), moment()],
-       },
-       startDate: moment().subtract(1, 'month'),
-       endDate: moment()
+    // initialize DatePicker (for drop date range filter)
+    this.daterangepickerOptions.settings = {
+      locale: { format: 'MM/DD/YY' },
+      alwaysShowCalendars: false,
+      ranges: {
+        'Today': [moment(), moment()],
+        'This Week': [moment(), moment().add(6, 'days')],
+        'This Month': [moment(), moment().subtract(1, 'months')],
+        'Last Month': [moment().subtract(1, 'month'), moment()],
+        'Last 3 Months': [moment().subtract(4, 'month'), moment()],
+        'Last 6 Months': [moment().subtract(6, 'month'), moment()],
+        'Last 12 Months': [moment().subtract(12, 'month'), moment()],
+      },
+      startDate: moment().subtract(1, 'month'),
+      endDate: moment()
     };
   }
 
@@ -148,7 +148,7 @@ export class HomeComponent implements OnInit {
     // log the event
     this.logger.addToLog("INFO", "Home Component activated.").subscribe((data => {
       const ack = data;
-      if (!ack){
+      if (!ack) {
         this.toastr.error('Logging Error!', 'bl-status: Logging Service');
       }
     }));
@@ -158,12 +158,12 @@ export class HomeComponent implements OnInit {
    * @method buildPiecePatternChart
    * @description collect data for 7-day Piece/Pattern Drop Chart
    */
-  buildPiecePatternChart(){
+  buildPiecePatternChart() {
     var days: Array<any> = [];
     var dayLabels: Array<any> = [];
     var dayPieces: Array<any> = [];
-    var pieces: Array<any> = [0,0,0,0,0,0,0];
-    var patterns: Array<any> = [0,0,0,0,0,0,0];
+    var pieces: Array<any> = [0, 0, 0, 0, 0, 0, 0];
+    var patterns: Array<any> = [0, 0, 0, 0, 0, 0, 0];
     // get date range (7 days).
     days[0] = moment();
     days[1] = moment().add(1, 'days');
@@ -190,15 +190,15 @@ export class HomeComponent implements OnInit {
         patterns[i] += 1;
       }
     }
-    for(var k = 0; k < days.length; k++){
+    for (var k = 0; k < days.length; k++) {
       dayLabels[k] = moment(days[k]).format("MM/DD");
     }
     // apply data to chart
     //dayLabels.unshift(" ");
     //patterns.unshift("patterns: ");
     //pieces.unshift("pieces: ")
-    this.lineChartData[0] = {data: patterns, label: "Pattern Count" };
-    this.lineChartData[1] = {data: pieces, label: "Piece Count"};
+    this.lineChartData[0] = { data: patterns, label: "Pattern Count" };
+    this.lineChartData[1] = { data: pieces, label: "Piece Count" };
     this.lineChartLabels = dayLabels;
   }
 
@@ -207,9 +207,9 @@ export class HomeComponent implements OnInit {
    * @description respond to letter checkbox filter -  check event
    * @param  $event check event
    */
-  checkLettersFilter($event){
+  checkLettersFilter($event) {
     this.isLetterFilterChecked = !this.isLetterFilterChecked;
-    if (this.isFlatFilterChecked){
+    if (this.isFlatFilterChecked) {
       this.isFlatFilterChecked = false;
     }
     this.refreshStatusData();
@@ -220,9 +220,9 @@ export class HomeComponent implements OnInit {
    * @description respond to flat checkbox filter -  check event
    * @param  $event check event
    */
-  checkFlatsFilter($event){
+  checkFlatsFilter($event) {
     this.isFlatFilterChecked = !this.isFlatFilterChecked;
-    if (this.isLetterFilterChecked){
+    if (this.isLetterFilterChecked) {
       this.isLetterFilterChecked = false;
     }
     this.refreshStatusData();
@@ -233,7 +233,7 @@ export class HomeComponent implements OnInit {
    * @description respond to flat checkbox filter -  check event
    * @param  $event check event
    */
-  checkCompleteFilter($event){
+  checkCompleteFilter($event) {
     this.isCompleteFilterChecked = !this.isCompleteFilterChecked;
     this.refreshStatusData();
   }
@@ -245,11 +245,11 @@ export class HomeComponent implements OnInit {
    * @param paperworkStatus
    * @returns true/false
    */
-  isComplete(sampleStatus: string, paperworkStatus: string){
-    if(sampleStatus == "Complete" && paperworkStatus == "Complete"){
+  isComplete(sampleStatus: string, paperworkStatus: string) {
+    if (sampleStatus == "Complete" && paperworkStatus == "Complete") {
       return true;
     }
-    else{
+    else {
       return false;
     }
   }
@@ -297,7 +297,7 @@ export class HomeComponent implements OnInit {
           return d.pattern.toLowerCase().indexOf(val) !== -1 || !val;
         });
       }
-      else{
+      else {
         // pass-through - no filter needed
         textFilter = [...this.temp];
       }
@@ -352,7 +352,7 @@ export class HomeComponent implements OnInit {
       }
 
       // filter complete status
-      if(this.isCompleteFilterChecked){
+      if (this.isCompleteFilterChecked) {
         completeFilter = [...pieceFilter]
         completeFilter = pieceFilter.filter(function (d) {
           if (d.sampleStatus == "Complete" && d.paperworkStatus == "Complete") {
@@ -363,7 +363,7 @@ export class HomeComponent implements OnInit {
           }
         });
       }
-      else{
+      else {
         // pass-through - no filter needed
         completeFilter = [...pieceFilter]
       }
@@ -425,8 +425,16 @@ export class HomeComponent implements OnInit {
       // skip generation processing if there is no Job Ticket data
       if (data.length == 0) {
         this.toastr.error('Job Ticket Not Found!', 'bl-status: Data Service');
+        // log the event
+        this.logger.addToLog("ERROR", "Job Ticket Print Failure - Job Ticket Not Found: " + this.jobNumber).subscribe((data => {
+          const ack = data;
+          if (!ack) {
+            this.toastr.error('Logging Error!', 'bl-status: Logging Service');
+          }
+        }));
         return;
       }
+
       this.job = data;
       this.aJob = this.job[0];
       this.company = this.job[0].Company;
@@ -459,6 +467,13 @@ export class HomeComponent implements OnInit {
           this.totalQty += parseInt(this.jobPatterns[i].canadian);
         }
         this.pdf.createPdf(this.buildJobTicketPdf(this.company, this.jobNumber, this.aJob)).open();
+        // log the event
+        this.logger.addToLog("INFO", "Job Ticket Print: " + this.jobNumber).subscribe((data => {
+          const ack = data;
+          if (!ack) {
+            this.toastr.error('Logging Error!', 'bl-status: Logging Service');
+          }
+        }));
       }));
     }));
   }

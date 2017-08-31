@@ -70,7 +70,7 @@ export class LoginComponent implements OnInit {
         else{
           this.message =  JSON.stringify(data.message);
           // log the event
-          this.logger.addToLog("ERROR", "Login Error: Username: " + this.model.username + " Error: " + this.message).subscribe((data => {
+          this.logger.addToLog("ERROR", "Login Error: Username: " + this.model.username + ", Error: " + this.message).subscribe((data => {
             const ack = data;
             if (!ack) {
               this.toastr.error('Logging Error!', 'bl-status: Logging Service');
