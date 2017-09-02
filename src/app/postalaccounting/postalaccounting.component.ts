@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 //
 import { ToastrService } from 'ngx-toastr';
+import { FileUploader } from 'ng2-file-upload/ng2-file-upload';
 //
 import { LoggingService } from '../logging.service';
+import { FileTransferService } from '../fileTransfer.service';
 
 @Component({
   selector: 'app-postalaccounting',
@@ -11,7 +13,13 @@ import { LoggingService } from '../logging.service';
 })
 export class PostalaccountingComponent implements OnInit {
 
-  constructor(private logger: LoggingService, private toastr: ToastrService) { }
+  urlRoot: string = 'http://172.16.248.19:8080/api'; // test
+
+  public uploader: FileUploader = new FileUploader({url: this.urlRoot + "/fileupload/"});
+
+  constructor(private logger: LoggingService,
+    private fts: FileTransferService,
+    private toastr: ToastrService) { }
 
   ngOnInit() {
     // log the event
@@ -20,6 +28,19 @@ export class PostalaccountingComponent implements OnInit {
       if (!ack){
         this.toastr.error('Logging Error!', 'bl-status: Logging Service');
       }
+    }));
+  }
+
+  upload(){
+    var formData = new FormData();
+    var pattern = "1111-01A";
+    var fileType = "Pallet Tags"
+    var sourcePath = "Source File Path Goes Here..."
+    var result = {};
+    formData.append
+    this.fts.uploadFile(formData, pattern, fileType, sourcePath).subscribe((data => {
+      result = data;
+      console.log("result: " + result);
     }));
   }
 
