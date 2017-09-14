@@ -126,7 +126,7 @@ export class HomeComponent implements OnInit {
         'This Week': [moment(), moment().add(6, 'days')],
         'This Month': [moment(), moment().subtract(1, 'months')],
         'Last Month': [moment().subtract(1, 'month'), moment()],
-        'Last 3 Months': [moment().subtract(4, 'month'), moment()],
+        'Last 3 Months': [moment().subtract(3, 'month'), moment()],
         'Last 6 Months': [moment().subtract(6, 'month'), moment()],
         'Last 12 Months': [moment().subtract(12, 'month'), moment()],
       },
@@ -216,7 +216,7 @@ export class HomeComponent implements OnInit {
   }
 
   /**
-   * @method checkLettersFilter
+   * @method checkFlatsFilter
    * @description respond to flat checkbox filter -  check event
    * @param  $event check event
    */
@@ -239,7 +239,7 @@ export class HomeComponent implements OnInit {
   }
 
   /**
-   * @method isConplete
+   * @method isComplete
    * @description determine if all tasks are done (sample & paperwork)
    * @param sampleStatus
    * @param paperworkStatus

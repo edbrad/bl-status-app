@@ -1,10 +1,201 @@
 <div class="container">
   <div class="starter-template">
     <h1>Postal Accounting</h1>
-    <p class="lead">bl-status Postal Accounting Page</p>
+    <!--<p class="lead">bl-status Postal Accounting Page</p>-->
+    <h3 style="margin-top: 3px;"><b>bl-status:</b> Postal Accounting Page</h3>
   </div>
   <div>
-    <input type="file" ng2FileSelect [uploader]="uploader" />
-    <button type="button" (click)="upload()">Upload</button>
+    <!-- filter -->
+    <div class="row">
+      <div class="col-xs-* col-sm-6 col-md-* col-lg-3">
+        <input type='text' style='padding:8px;margin:5px auto;width:100%;' placeholder='Type to filter the pattern column...' (keyup)='updatePatternFilter($event)'
+          [(ngModel)]='this.filterText' />
+      </div>
+      <div class="col-xs-* col-sm-6 col-md-* col-lg-2" style="margin-top:7px;">
+        <!-- refresh -->
+        <button (click)="refreshStatusData()" class="btn btn-primary">
+      <span class="glyphicon glyphicon-refresh"></span> Refresh
+    </button>
+      </div>
+      <!-- additional filters -->
+      <div class="col-xs-* col-sm-12 col-md-* col-lg-7">
+        <!-- datepicker -->
+        <div style="padding:0px;margin-top:7px;width: 50%;float: left;">
+          <span>Drop Dates: </span>
+          <input type="text" name="daterangeInput" daterangepicker [options]="options" (selected)="selectedDate($event, daterange)"
+            class="input" style="padding:7px;" />
+        </div>
+        <!-- checkboxes -->
+        <span style='padding:8px;margin:5px; float: right;'>
+    <div class="form-check form-check-inline">
+        <span>Show Only: </span>
+        <label class="checkbox-inline">
+        <input type="checkbox" [checked]="isLetterFilterChecked" (change)="checkLettersFilter($event)">Letters
+      </label>
+        <label class="checkbox-inline">
+        <input type="checkbox" [checked]="isFlatFilterChecked" (change)="checkFlatsFilter($event)">Flats
+      </label>
+        <label class="checkbox-inline">
+        <input type="checkbox" [checked]="isCompleteFilterChecked" (change)="checkCompleteFilter($event)">Complete
+      </label>
+      </div>
+      </span>
+    </div>
+  </div>
+  <div style="text-align: left;color: #3577ba;"><small><b>data last refreshed @:</b> {{this.lastRefreshDate}}</small></div>
+  <!-- data table (ngx-datatable) -->
+  <div style="margin-top: 15px">
+    <ngx-datatable (page)="onPage($event)" class="material expandable" #postalAccountingTable [rows]="rows" [columns]="columns"
+      [columnMode]="'force'" [sortType]="'multi'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [limit]="10"
+      [rowClass]="getRowClass">
+      <!-- Row Detail Template (expandable) -->
+      <ngx-datatable-row-detail [rowHeight]="'auto'" #myDetailRow (toggle)="onDetailToggle($event)">
+        <ng-template let-row="row" let-expanded="expanded" ngx-datatable-row-detail-template>
+            <div style="margin-left: 10px; margin-right:10px;"><strong>PAPERWORK DETAILS:</strong><span style="color: #3577ba; margin-left: 4px;"><b>{{row.pattern}}</b></span></div>
+            <div style="margin-top: 10px; margin-bottom: 5px; margin-left: 10px; margin-right: 10px;" class="btn-group" role="group" aria-label="...">
+              <button type="button" class="btn btn-default">New</button>
+              <button type="button" class="btn btn-default">In Progress</button>
+              <button type="button" class="btn btn-default">Complete</button>
+            </div>
+            <!-- pallet tag upload -->
+            <div class="row" style="margin-left: 10px; margin-right:10px;">
+              <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                <h3>Pallet Tag PDF Upload</h3>
+                <div>
+                  <div>
+                    <input (click)="setCurrentPalletPattern(row.pattern)" type="file" name="palletUpload" ng2FileSelect [uploader]="uploaderPalletTags"/>
+                  </div>
+                  <div>
+                    <button type="button" class="btn btn-primary btn-s" style="margin-top: 5px; margin-bottom: 5px;" (click)="uploadPalletTags(row.pattern)"
+                      [disabled]="enablePalletTagsUpload(row.pattern)">
+                        <span class="glyphicon glyphicon-upload"></span> Upload Pallet Tags </button>
+                  </div>
+                </div>
+                <div>
+                  Pallet Tag PDF Upload progress: {{getPalletTagProgress(row.pattern)}}%
+                  <div class="progress" style="margin-top: 5px; width: 75%">
+                    <div class="progress-bar" role="progressbar" [ngStyle]="{ 'width': getPalletTagProgress(row.pattern) + '%'}"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-xs-8 col-sm-9 col-md-6 col-lg-6">
+                <div class="table-responsive">
+                  <p><i class="fa fa-file-pdf-o" aria-hidden="true"></i> File Information:</p>
+                  <table class="table table-condensed table-bordered">
+                    <tr>
+                      <td><b>Current File:</b></td>
+                      <td>example-pdf-file.pdf</td>
+                    </tr>
+                    <tr>
+                      <td><b>Upload Date/Time:</b></td>
+                      <td>09/22/2017</td>
+                    </tr>
+                    <tr>
+                      <td><b>User:</b></td>
+                      <td>admin</td>
+                    </tr>
+                    <tr>
+                      <td><b>Download Count:</b></td>
+                      <td>0</td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <!-- pallet worksheet upload -->
+            <div class="row" style="margin-left: 10px; margin-right:10px;">
+              <div class="col-xs-8 col-sm-9 col-md-6 col-lg-6">
+                <h3>Pallet Worksheet PDF Upload</h3>
+                <div>
+                  <div>
+                    <input (click)="setCurrentWorksheetPattern(row.pattern)" type="file" name="worksheetUpload" ng2FileSelect [uploader]="uploaderPalletWorksheets"/>
+                  </div>
+                  <div>
+                    <button type="button" class="btn btn-warning btn-s" style="margin-top: 5px; margin-bottom: 5px;" (click)="uploadPalletWorksheet(row.pattern)"
+                    [disabled]="enablePalletWorksheetUpload(row.pattern)">
+                        <span class="glyphicon glyphicon-upload"></span> Upload Pallet Worksheet </button>
+                  </div>
+                </div>
+                <div>
+                  Pallet Worksheet Upload progress: {{getPalletWorksheetProgress(row.pattern)}}%
+                  <div class="progress" style="margin-top: 5px; width: 75%">
+                    <div class="progress-bar" role="progressbar" [ngStyle]="{ 'width': getPalletWorksheetProgress(row.pattern) + '%'}"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-xs-8 col-sm-9 col-md-6 col-lg-6">
+                <div class="table-responsive">
+                  <p><i class="fa fa-file-pdf-o" aria-hidden="true"></i> File Information:</p>
+                  <table class="table table-condensed table-bordered">
+                    <tr>
+                      <td><b>Current File:</b></td>
+                      <td>example-pdf-file.pdf</td>
+                    </tr>
+                    <tr>
+                      <td><b>Upload Date/Time:</b></td>
+                      <td>09/22/2017</td>
+                    </tr>
+                    <tr>
+                      <td><b>User:</b></td>
+                      <td>admin</td>
+                    </tr>
+                    <tr>
+                      <td><b>Download Count:</b></td>
+                      <td>0</td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+            </div>
+        </ng-template>
+      </ngx-datatable-row-detail>
+      <!-- Column Templates -->
+      <ngx-datatable-column [width]="50" [resizeable]="false" [sortable]="false" [draggable]="false" [canAutoResize]="false">
+        <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+          <a [class.datatable-icon-right]="!expanded" [class.datatable-icon-down]="expanded" title="Expand/Collapse Row" (click)="toggleExpandRow(row)">
+      </a>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Pattern">
+        <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+          <strong>{{row.pattern}}</strong><span *ngIf="isComplete(row.sampleStatus, row.paperworkStatus)"><i class="fa fa-check" aria-hidden="true" style="color:green"></i></span>
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Project" [width]="280">
+        <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+          {{row.project}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Mail Class">
+        <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+          {{row.mailClass}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Sample Status" [cellClass]="getSampleCellClass">
+        <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+          {{row.sampleStatus}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Paperwork Status" [cellClass]="getPaperworkCellClass">
+        <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+          {{row.paperworkStatus}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Piece Type">
+        <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+          {{row.type}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Piece Count">
+        <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+          {{row.total | addCommas}}
+        </ng-template>
+      </ngx-datatable-column>
+      <ngx-datatable-column name="Drop Date">
+        <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+          {{row.dropDate}}
+        </ng-template>
+      </ngx-datatable-column>
+    </ngx-datatable>
   </div>
 </div>

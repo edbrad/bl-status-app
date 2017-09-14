@@ -17,7 +17,6 @@ import { AuthenticationService } from './auth/auth.service';
 import { AuthGuard } from './auth/authguard';
 import { DataService } from './data.service';
 import { LoggingService } from './logging.service';
-import { FileTransferService } from './fileTransfer.service';
 
 // custom components
 import { routing } from './app.routing';
@@ -69,7 +68,6 @@ import { AddCommasPipe } from './add-commas.pipe';
     AuthenticationService,
     DataService,
     LoggingService,
-    FileTransferService,
   ],
   bootstrap: [AppComponent]
 })
