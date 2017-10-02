@@ -1,11 +1,13 @@
 declare var moment: any;  /** prevent TypeScript typings error when using non-TypeSCript Lib (momentJS) */
 import { Component, OnInit, ViewEncapsulation, ViewChild } from '@angular/core';
-//
+
+// 3rd-party/open-source components
 import { ToastrService } from 'ngx-toastr';
 import { DaterangepickerConfig } from 'ng2-daterangepicker';
 import { DaterangePickerComponent } from 'ng2-daterangepicker';
 import { FileUploader, FileUploaderOptions, Headers, FileItem } from 'ng2-file-upload/ng2-file-upload';
-//
+
+// custom services
 import { LoggingService } from '../logging.service';
 import { AuthenticationService } from '../auth/auth.service';
 import { DataService } from '../data.service';
@@ -31,8 +33,10 @@ export class PostalaccountingComponent implements OnInit {
   temp = []
   data = [];
   expanded: any = {};
+  expanded_save: any = {};
   timeout: any;
   @ViewChild('postalAccountingTable') table: any; /** data table html reference */
+  expandedRows: any[] = [];
 
   // file upload metadata fields (stored in db)
   pattern = "9999-99X";
@@ -169,20 +173,20 @@ export class PostalaccountingComponent implements OnInit {
       }
     }));
 
-    // --
+    // -- Pallet Tag Uploader event hooks
     // get ready for Pallet Tags file upload (ng2-file-uploader)
     this.uploaderPalletTags.onAfterAddingFile = (file)=> {
       // disable authentication
       file.withCredentials = false;
       // update file metadata
-      this.uploaderPalletTags.options.additionalParameter['pattern'] = this.pattern;
+      this.uploaderPalletTags.options.additionalParameter['pattern'] = this.currentPalletTagPattern;
       this.uploaderPalletTags.options.additionalParameter['fileType'] = "Pallet Tags";
       this.uploaderPalletTags.options.additionalParameter['user'] = this.user;
       this.uploaderPalletTags.options.additionalParameter['clientFilePath'] = file.file.name;
       this.uploaderPalletTags.options.additionalParameter['serverFilePath'] = this.serverFilePath;
       this.uploaderPalletTags.options.additionalParameter['filePostDateTime'] = moment().format();
       this.uploaderPalletTags.options.additionalParameter['downloadCount'] = 0;
-      this.uploaderPalletTags.options.additionalParameter['replacementCount'] = this.checkReplacementCount(this.pattern, file.file.name);
+      this.uploaderPalletTags.options.additionalParameter['replacementCount'] = this.checkReplacementCount(this.currentPalletTagPattern, file.file.name);
     };
 
     // override Pallet Tags progress bar method - to set progress for the appropriate pattern
@@ -198,15 +202,16 @@ export class PostalaccountingComponent implements OnInit {
     this.uploaderPalletTags.onCompleteItem = (item: any, response: any, status: any, headers: any) => {
       this.toastr.success('File Uploaded!', 'bl-status: FileUploader');
       this.uploaderPalletTags.removeFromQueue(item);
+      this.refreshStatusData();
     };
 
-    // --
+    // -- Pallet Worksheet Uploader event hooks
     // get ready for Pallet Worksheet file upload (ng2-file-uploader)
     this.uploaderPalletWorksheets.onAfterAddingFile = (file)=> {
       // disable authentication
       file.withCredentials = false;
       // update file metadata
-      this.uploaderPalletWorksheets.options.additionalParameter['pattern'] = this.pattern;
+      this.uploaderPalletWorksheets.options.additionalParameter['pattern'] = this.currentWorksheetPattern;
       this.uploaderPalletWorksheets.options.additionalParameter['fileType'] = "Pallet Worksheet";
       this.uploaderPalletWorksheets.options.additionalParameter['user'] = this.user;
       this.uploaderPalletWorksheets.options.additionalParameter['clientFilePath'] = file.file.name;
@@ -229,6 +234,7 @@ export class PostalaccountingComponent implements OnInit {
     this.uploaderPalletWorksheets.onCompleteItem = (item: any, response: any, status: any, headers: any) => {
       this.toastr.success('File Uploaded!', 'bl-status: FileUploader');
       this.uploaderPalletWorksheets.removeFromQueue(item);
+      this.refreshStatusData();
     };
   }
 
@@ -254,7 +260,7 @@ export class PostalaccountingComponent implements OnInit {
 
   /**
    * @method getPalletTagProgress
-   * @description get the progress (%) for the current file being uploaded
+   * @description get the progress (%) for the current file being uploaded (tracked in array)
    * @param pattern the associated pattern for the file being uploaded
    */
   getPalletTagProgress(pattern: string) {
@@ -269,7 +275,7 @@ export class PostalaccountingComponent implements OnInit {
 
   /**
    * @method getPalletWorksheetProgress
-   * @description get the progress (%) for the current file being uploaded
+   * @description get the progress (%) for the current file being uploaded (tracked in array)
    * @param pattern the associated pattern for the file being uploaded
    */
   getPalletWorksheetProgress(pattern: string) {
@@ -284,7 +290,7 @@ export class PostalaccountingComponent implements OnInit {
 
   /**
    * @method setCurrentPalletPattern
-   * @description set the associated pattern for the file being uploaded
+   * @description set the associated pattern for the file being uploaded (tracked in array)
    * @param pattern the associated pattern for the file being uploaded
    */
   setCurrentPalletPattern(pattern: string){
@@ -299,7 +305,7 @@ export class PostalaccountingComponent implements OnInit {
 
   /**
    * @method setCurrentWorksheetPattern
-   * @description set the associated pattern for the file being uploaded
+   * @description set the associated pattern for the file being uploaded (tracked in array)
    * @param pattern the associated pattern for the file being uploaded
    */
   setCurrentWorksheetPattern(pattern: string){
@@ -314,7 +320,8 @@ export class PostalaccountingComponent implements OnInit {
 
   /**
    * @method enablePalletTagsUpload
-   * @description determine if the current upload button is to be enabled to allow upload
+   * @description determine if the current upload button is to be enabled to
+   * allow upload - a file must be selected
    * @param pattern the associated pattern for the file being uploaded
    */
   enablePalletTagsUpload(pattern: string){
@@ -329,7 +336,8 @@ export class PostalaccountingComponent implements OnInit {
 
   /**
    * @method enablePalletWorksheetUpload
-   * @description determine if the current upload button is to be enabled to allow upload
+   * @description determine if the current upload button is to be enabled to
+   * allow upload - a file must be selected
    * @param pattern the associated pattern for the file being uploaded
    */
   enablePalletWorksheetUpload(pattern: string){
@@ -345,12 +353,14 @@ export class PostalaccountingComponent implements OnInit {
   /**
    * @method checkReplacementCount
    * @description check for existing file and return the replacement count
-   * @param pattern
-   * @param fileName
+   * @param pattern the given pattern to check
+   * @param fileName the given file name to check
    */
   checkReplacementCount(pattern: string, fileName: string){
     // TODO: check for exiting file in database (file catalog) and filesystem; iterate replacement
     // count accordingly
+
+    // return the existing replacement count
     return 0;
   }
 
@@ -361,9 +371,11 @@ export class PostalaccountingComponent implements OnInit {
    */
   checkLettersFilter($event) {
     this.isLetterFilterChecked = !this.isLetterFilterChecked;
+    // toggle Flats checkbox appropriately (cannot have both letter and flat checked)
     if (this.isFlatFilterChecked) {
       this.isFlatFilterChecked = false;
     }
+    // apply filter
     this.refreshStatusData();
   }
 
@@ -374,9 +386,11 @@ export class PostalaccountingComponent implements OnInit {
    */
   checkFlatsFilter($event) {
     this.isFlatFilterChecked = !this.isFlatFilterChecked;
+    // toggle Letters checkbox appropriately (cannot have both letter and flat checked)
     if (this.isLetterFilterChecked) {
       this.isLetterFilterChecked = false;
     }
+    // apply filter
     this.refreshStatusData();
   }
 
@@ -387,6 +401,7 @@ export class PostalaccountingComponent implements OnInit {
    */
   checkCompleteFilter($event) {
     this.isCompleteFilterChecked = !this.isCompleteFilterChecked;
+    // apply filter
     this.refreshStatusData();
   }
 
@@ -413,10 +428,11 @@ export class PostalaccountingComponent implements OnInit {
    */
   updatePatternFilter(event) {
     const val = event.target.value.toLowerCase();
-    // filter our data
+    // filter pattern code data
     const temp = this.temp.filter(function (d) {
       return d.pattern.toLowerCase().indexOf(val) !== -1 || !val;
     });
+    // apply filter
     this.refreshStatusData();
 
     // whenever the filter changes, always go back to the first page
@@ -429,11 +445,14 @@ export class PostalaccountingComponent implements OnInit {
    * existing filters
    */
   refreshStatusData() {
-    // get all statuses from the external REST API
+    this.expanded_save = this.expanded;
+    // initialize filter "buckets" to hold possible filters
     var textFilter: any[] = [];
     var dateFilter: any[] = [];
     var pieceFilter: any[] = [];
     var completeFilter: any[] = [];
+
+    // get all statuses from the external REST API
     this.ds.getAllStatuses().subscribe((data => {
       // save data from database
       this.rows = data;
@@ -518,7 +537,7 @@ export class PostalaccountingComponent implements OnInit {
         completeFilter = [...pieceFilter]
       }
 
-      // update Pallet Tag & Worksheet upload progress array
+      // re-initialize Pallet Tag & Worksheet upload progress arrays
       this.palletTagUploadProgress = [];
       for(var p of completeFilter){
         var pat = {
@@ -536,11 +555,21 @@ export class PostalaccountingComponent implements OnInit {
         this.palletWorksheetUploadProgress.push(pat);
       }
 
+      // expand rows that were already expanded before refresh
+      /*for(var row of this.expandedRows){
+        console.log("re-expandx row: " + JSON.stringify(row));
+        this.table.rowDetail.toggleExpandRow(row);
+      }*/
+      //this.table.rowDetail.expandAllRows();
+      //this.expandAllDetails()
+
       // finally, update the rows to be displayed
       this.rows = completeFilter;
+      this.expanded = this.expanded_save;
+
 
       // whenever the filter changes, always go back to the first page
-      this.table.offset = 0;
+      //this.table.offset = 0;
       this.lastRefreshDate = moment();
 
     }));
@@ -554,7 +583,7 @@ export class PostalaccountingComponent implements OnInit {
   onPage(event) {
     clearTimeout(this.timeout);
     this.timeout = setTimeout(() => {
-    }, 10);
+    }, 100);
   }
 
   /**
@@ -562,8 +591,21 @@ export class PostalaccountingComponent implements OnInit {
    * @description toggle selected row detail view open and closed
    * @param row the selected row
    */
-  toggleExpandRow(row) {
+  toggleExpandRow(row, expanded) {
+    console.log("toggle row pattern: " + row.pattern + " exp: " + JSON.stringify(expanded));
+    console.log("this-expanded: " + JSON.stringify(expanded));
+    console.log("row: " + JSON.stringify(row))
     this.table.rowDetail.toggleExpandRow(row);
+    if (expanded == false) {
+      this.expandedRows.push(row);
+    }
+    else {
+      const idx: number = this.expandedRows.indexOf(row);
+      if (idx != -1) {
+        this.expandedRows.splice(idx, 1);
+      }
+    }
+    console.log("expanded row count: " + this.expandedRows.length);
   }
 
   /**
@@ -572,7 +614,36 @@ export class PostalaccountingComponent implements OnInit {
    * @param event the given toggle even
    */
   onDetailToggle(event) {
-    // TODO:???
+    // TODO: trigger "In progress" status when user views the pattern details
+    console.log("detail toggle event!: " + JSON.stringify(event))
+  }
+
+  expandAllDetails(){
+    console.log("expand all");
+    this.table.rowDetail.expandAllRows()
+  }
+
+  collapseAllDetails(){
+    console.log("collapse all details!");
+    this.table.rowDetail.collapseAllRows()
+  }
+
+  onExpandRow(row) {
+    console.log("onExpandRow event!")
+    this.table.rowDetail.collapseAllRows();
+    this.table.rowDetail.toggleExpandRow(row);
+ }
+
+  onCollapseRow() {
+    console.log("onCollapseRow event!")
+    this.table.rowDetail.collapseAllRows();
+  }
+
+  restoreDetails() {
+    for (var row of this.expandedRows) {
+      console.log("re-expandx row: " + JSON.stringify(row));
+      this.table.rowDetail.toggleExpandRow(row);
+    }
   }
 
   /**
@@ -609,6 +680,57 @@ export class PostalaccountingComponent implements OnInit {
       'paperwork-issue': value === 'Issue',
       'paperwork-complete': value === 'Complete',
     };
+  }
+
+  /**
+   * @method hideNewLabel
+   * @description
+   * @param row
+   */
+  hideNewLabel(row){
+    if (row.paperworkStatus != "Replacement"){
+      return false;
+    }
+    else{
+      return true;
+    }
+  }
+
+  hideReplacementLabel(row){
+    if (row.paperworkStatus == "Replacement"){
+      return false;
+    }
+    else{
+      return true;
+    }
+  }
+
+  hideInProgressLabel(row){
+    if(row.paperworkStatus == "In Process" || row.paperworkStatus == "Complete"
+      || row.paperworkStatus == "Issue" ){
+      return false;
+    }
+    else{
+      return true;
+    }
+  }
+
+  hideIssueLabel(row){
+    if(row.paperworkStatus == "Issue" ){
+      return false;
+    }
+    else{
+      return true;
+    }
+  }
+
+  hideCompleteLabel(row){
+    if(row.paperworkStatus == "Complete" ){
+      return false;
+    }
+    else{
+      return true;
+    }
   }
 
 }
