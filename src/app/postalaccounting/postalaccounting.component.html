@@ -1,8 +1,8 @@
 <div class="container">
   <div class="starter-template">
-    <h1>Postal Accounting</h1>
+    <!--<h1>Postal Accounting</h1>-->
     <!--<p class="lead">bl-status Postal Accounting Page</p>-->
-    <h3 style="margin-top: 3px;"><b>bl-status:</b> Postal Accounting Page</h3>
+    <h3 style="margin-top: 3px;"><b>bl-status:</b> Postal Accounting Summary</h3>
   </div>
   <div>
     <!-- filter -->
@@ -44,139 +44,16 @@
   </div>
   <div style="text-align: left;color: #3577ba;"><small><b>data last refreshed @:</b> {{this.lastRefreshDate}}</small></div>
   <div>
-  <small>
-    <a [routerLink]="[]" (click)="expandAllDetails()">Expand All</a> |
-    <a [routerLink]="[]" (click)="collapseAllDetails()">Collapse All</a>
-    <a [routerLink]="[]" (click)="restoreDetails()">Restore Details</a>
-  </small>
 </div>
   <!-- data table (ngx-datatable) -->
   <div style="margin-top: 15px">
     <ngx-datatable (page)="onPage($event)" class="material expandable" #postalAccountingTable [rows]="rows" [columns]="columns"
       [columnMode]="'force'" [sortType]="'multi'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [limit]="10"
       [rowClass]="getRowClass">
-      <!-- Row Detail Template (expandable) -->
-      <ngx-datatable-row-detail [rowHeight]="'auto'" #myDetailRow (toggle)="onDetailToggle($event)">
-        <ng-template let-row="row" let-expanded="expanded" ngx-datatable-row-detail-template>
-            <div style="margin-left: 10px; margin-right:10px;"><strong>PAPERWORK DETAILS:</strong><span style="color: #3577ba; margin-left: 4px;"><b>{{row.pattern}}</b></span></div>
-            <!-- progress labels -->
-            <div style="width: 50%; margin-left: 10px; margin-bottom: 10px;">
-              <span [hidden]="hideNewLabel(row)" class="label label-default">New</span>
-              <span [hidden]="hideReplacementLabel(row)" class="label label-warning">Replacement</span>
-              <span [hidden]="hideInProgressLabel(row)" class="label label-primary disabled">In Progress</span>
-              <span [hidden]="hideIssueLabel(row)" class="label label-danger disabled">Issue</span>
-              <span [hidden]="hideCompleteLabel(row)" class="label label-success disabled">Complete!</span>
-            </div>
-            <!-- pallet tag upload -->
-            <div class="row" style="margin-left: 10px; margin-right:10px;">
-              <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-                <h3>Pallet Tag PDF Upload</h3>
-                <div>
-                  <div>
-                    <input (click)="setCurrentPalletPattern(row.pattern)" type="file" name="palletUpload" ng2FileSelect [uploader]="uploaderPalletTags"/>
-                  </div>
-                  <div>
-                    <button type="button" class="btn btn-primary btn-s" style="margin-top: 5px; margin-bottom: 5px;" (click)="uploadPalletTags(row.pattern)"
-                      [disabled]="enablePalletTagsUpload(row.pattern)">
-                        <span class="glyphicon glyphicon-upload"></span> Upload Pallet Tags </button>
-                  </div>
-                </div>
-                <div>
-                  Pallet Tag PDF Upload progress: {{getPalletTagProgress(row.pattern)}}%
-                  <div class="progress" style="margin-top: 5px; width: 75%">
-                    <div class="progress-bar" role="progressbar" [ngStyle]="{ 'width': getPalletTagProgress(row.pattern) + '%'}"></div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-xs-8 col-sm-9 col-md-6 col-lg-6">
-                <div class="table-responsive">
-                  <p><i class="fa fa-file-pdf-o" aria-hidden="true"></i> File Information:</p>
-                  <table class="table table-condensed table-bordered">
-                    <tr>
-                      <td><b>Current File:</b></td>
-                      <td>{{row.currentPalletTagFile}}</td>
-                    </tr>
-                    <tr>
-                      <td><b>Upload Date/Time:</b></td>
-                      <td>{{row.palletTagFileUploadDateTime}}</td>
-                    </tr>
-                    <tr>
-                      <td><b>User:</b></td>
-                      <td>{{row.palletTagFileUser}}</td>
-                    </tr>
-                    <tr>
-                      <td><b>Download Count:</b></td>
-                      <td>{{row.palletTagFileDownloadCount}}</td>
-                    </tr>
-                    <tr>
-                      <td><b>Replacement Count:</b></td>
-                      <td>{{row.palletTagReplacementCount}}</td>
-                    </tr>
-                  </table>
-                </div>
-              </div>
-            </div>
-            <!-- pallet worksheet upload -->
-            <div class="row" style="margin-left: 10px; margin-right:10px;">
-              <div class="col-xs-8 col-sm-9 col-md-6 col-lg-6">
-                <h3>Pallet Worksheet PDF Upload</h3>
-                <div>
-                  <div>
-                    <input (click)="setCurrentWorksheetPattern(row.pattern)" type="file" name="worksheetUpload" ng2FileSelect [uploader]="uploaderPalletWorksheets"/>
-                  </div>
-                  <div>
-                    <button type="button" class="btn btn-warning btn-s" style="margin-top: 5px; margin-bottom: 5px;" (click)="uploadPalletWorksheet(row.pattern)"
-                    [disabled]="enablePalletWorksheetUpload(row.pattern)">
-                        <span class="glyphicon glyphicon-upload"></span> Upload Pallet Worksheet </button>
-                  </div>
-                </div>
-                <div>
-                  Pallet Worksheet Upload progress: {{getPalletWorksheetProgress(row.pattern)}}%
-                  <div class="progress" style="margin-top: 5px; width: 75%">
-                    <div class="progress-bar" role="progressbar" [ngStyle]="{ 'width': getPalletWorksheetProgress(row.pattern) + '%'}"></div>
-                  </div>
-                </div>
-              </div>
-              <div class="col-xs-8 col-sm-9 col-md-6 col-lg-6">
-                <div class="table-responsive">
-                  <p><i class="fa fa-file-pdf-o" aria-hidden="true"></i> File Information:</p>
-                  <table class="table table-condensed table-bordered">
-                    <tr>
-                      <td><b>Current File:</b></td>
-                      <td>{{row.currentPalletWorksheetFile}}</td>
-                    </tr>
-                    <tr>
-                      <td><b>Upload Date/Time:</b></td>
-                      <td>{{row.palletWorksheetFileUploadDateTime}}</td>
-                    </tr>
-                    <tr>
-                      <td><b>User:</b></td>
-                      <td>{{row.palletWorksheetFileUser}}</td>
-                    </tr>
-                    <tr>
-                      <td><b>Download Count:</b></td>
-                      <td>{{row.palletWorksheetFileDownloadCount}}</td>
-                    </tr>
-                    <tr>
-                      <td><b>Replacement Count:</b></td>
-                      <td>{{row.palletWorksheetReplacementCount}}</td>
-                    </tr>
-                  </table>
-                </div>
-              </div>
-            </div>
-        </ng-template>
-      </ngx-datatable-row-detail>
       <!-- Column Templates -->
-      <ngx-datatable-column [width]="50" [resizeable]="false" [sortable]="false" [draggable]="false" [canAutoResize]="false">
-        <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
-          <a [class.datatable-icon-right]="!expanded" [class.datatable-icon-down]="expanded" title="Expand/Collapse Row" (click)="toggleExpandRow(row, expanded)">
-      </a>
-        </ng-template>
-      </ngx-datatable-column>
       <ngx-datatable-column name="Pattern">
         <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
-          <strong>{{row.pattern}}</strong><span *ngIf="isComplete(row.sampleStatus, row.paperworkStatus)"><i class="fa fa-check" aria-hidden="true" style="color:green"></i></span>
+          <a [routerLink]="['/postalaccounting-details', row.pattern]"><strong>{{row.pattern}}</strong><span *ngIf="isComplete(row.sampleStatus, row.paperworkStatus)"><i class="fa fa-check" aria-hidden="true" style="color:green"></i></span></a>
         </ng-template>
       </ngx-datatable-column>
       <ngx-datatable-column name="Project" [width]="280">

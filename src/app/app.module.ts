@@ -6,6 +6,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 // 3rd-party/open-source components
 import { CollapseModule } from 'ngx-bootstrap';
+import { ModalModule } from 'ngx-bootstrap/modal';
 import { Daterangepicker } from 'ng2-daterangepicker';
 import { ToastrModule } from 'ngx-toastr';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
@@ -27,6 +28,7 @@ import { LoginComponent } from './auth/login.component';
 import { HomeComponent } from './home/home.component';
 import { SampleroomComponent } from './sampleroom/sampleroom.component';
 import { PostalaccountingComponent } from './postalaccounting/postalaccounting.component';
+import { PostalaccountingDetailsComponent } from './postalaccounting-details/postalaccounting-details.component'
 import { DropshippingComponent } from './dropshipping/dropshipping.component';
 import { AdminComponent } from './admin/admin.component';
 
@@ -45,7 +47,8 @@ import { AddCommasPipe } from './add-commas.pipe';
     DropshippingComponent,
     AdminComponent,
     AddCommasPipe,
-    FileSelectDirective
+    FileSelectDirective,
+    PostalaccountingDetailsComponent
   ],
   imports: [
     BrowserModule,
@@ -62,6 +65,7 @@ import { AddCommasPipe } from './add-commas.pipe';
     NgxDatatableModule,
     Daterangepicker,
     ChartsModule,
+    ModalModule.forRoot(),
   ],
   providers: [
     AuthGuard,

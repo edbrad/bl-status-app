@@ -1,0 +1,162 @@
+<div class="container">
+  <h3 style="margin-top: 3px;"><b>bl-status:</b> Postal Accounting Details</h3>
+  <h3 style="margin-bottom: 0px;">Pattern: <span style="color: #3577ba;"><b>{{patternData.pattern}}</b></span></h3>
+  <small><a routerLink="/postalaccounting">BACK TO PATTERNS</a></small>
+  <div style="margin-top: 10px; margin-bottom: 2px;">
+    <table class="table table-condensed table-bordered table-responsive">
+      <tr>
+        <td class="col-md-2 col-sm-1"><b>Client:</b></td>
+        <td class="col-md-4 col-sm-2">{{patternData.client}}</td>
+        <td class="col-md-2 col-sm-1"><b>Piece Specs:</b></td>
+        <td class="col-md-4 col-sm-2">{{patternData.Specs}}</td>
+      </tr>
+      <tr>
+        <td class="col-md-2 col-sm-1"><b>Project:</b></td>
+        <td class="col-md-4 col-sm-2">{{patternData.project}}</td>
+        <td class="col-md-2 col-sm-1"><b>Type:</b></td>
+        <td class="col-md-4 col-sm-2">{{patternData.type}}</td>
+      </tr>
+      <tr>
+        <td class="col-md-2 col-sm-1"><b>Total Pieces:</b></td>
+        <td class="col-md-4 col-sm-2">{{patternData.total | addCommas}}</td>
+        <td class="col-md-2 col-sm-1"><b>EPOP?:</b></td>
+        <td class="col-md-4 col-sm-2">{{patternData.isEPOP}}</td>
+      </tr>
+      <tr>
+        <td class="col-md-2 col-sm-1"><b>Single Piece Count:</b></td>
+        <td class="col-md-4 col-sm-2">{{patternData.spr}}</td>
+        <td class="col-md-2 col-sm-1"><b>Failed Piece Count:</b></td>
+        <td class="col-md-4 col-sm-2">{{patternData.fail}}</td>
+      </tr>
+      <tr>
+        <td class="col-md-2 col-sm-1"><b>Sample Note(s):</b></td>
+        <td class="col-md-4 col-sm-2">--</td>
+        <td class="col-md-2 col-sm-1"><b>Accounting Note(s):</b></td>
+        <td class="col-md-4 col-sm-2">--</td>
+      </tr>
+    </table>
+    <button type="button" class="btn btn-primary btn-s" style="margin-top: 0px; margin-bottom: 0px;" (click)="editAccountingNotes(template)">
+    <span class="glyphicon glyphicon-edit"></span> Edit Accounting Note(s) </button>
+  </div>
+  <hr>
+  <!-- pallet tag upload -->
+  <div class="row" style="margin-left: 10px;">
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+      <h3>Pallet Tag PDF File Upload</h3>
+      <div>
+        <div>
+          <input type="file" name="palletUpload" ng2FileSelect [uploader]="uploaderPalletTags" />
+        </div>
+        <div>
+          <button type="button" class="btn btn-primary btn-s" style="margin-top: 5px; margin-bottom: 5px;" (click)="uploadPalletTags()"
+            [disabled]="enablePalletTagsUpload()">
+                <span class="glyphicon glyphicon-upload"></span> Upload Pallet Tags </button>
+        </div>
+      </div>
+      <div>
+        Pallet Tag PDF Upload progress: {{getPalletTagProgress()}}%
+        <div class="progress" style="margin-top: 5px; width: 75%">
+          <div class="progress-bar" role="progressbar" [ngStyle]="{ 'width': getPalletTagProgress() + '%'}"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-8 col-sm-9 col-md-6 col-lg-6">
+      <div class="table-responsive">
+        <!--<p><i class="fa fa-file-pdf-o" aria-hidden="true"></i> File Information:</p>-->
+        <button style="margin-bottom: 5px;" type="button" class="btn btn-danger btn-xs" (click)="deletePalletPDF()"
+            [disabled]="enablePalletTagsDelete()">
+          <span class="glyphicon glyphicon-trash"></span> Delete Pallet Tag PDF File</button>
+        <table class="table table-condensed table-bordered">
+          <tr>
+            <td style="width:30%"><b>Current File:</b></td>
+            <td style="width:70%">{{[patternData.currentPalletTagFile]}}</td>
+          </tr>
+          <tr>
+            <td><b>Upload Date/Time:</b></td>
+            <td>{{[patternData.palletTagFileUploadDateTime]}}</td>
+          </tr>
+          <tr>
+            <td><b>User:</b></td>
+            <td>{{[patternData.palletTagFileUser]}}</td>
+          </tr>
+          <tr>
+            <td><b>Download Count:</b></td>
+            <td>{{[patternData.palletTagFileDownloadCount]}}</td>
+          </tr>
+          <tr>
+            <td><b>Replacement Count:</b></td>
+            <td>{{[patternData.palletTagReplacementCount]}}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+  <!-- pallet worksheet upload -->
+  <div class="row" style="margin-left: 10px;">
+    <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+      <h3>Pallet Worksheet PDF File Upload</h3>
+      <div>
+        <div>
+          <input type="file" name="worksheetUpload" ng2FileSelect [uploader]="uploaderPalletWorksheets" />
+        </div>
+        <div>
+          <button type="button" class="btn btn-warning btn-s" style="margin-top: 5px; margin-bottom: 5px;" (click)="uploadPalletWorksheet()"
+            [disabled]="enablePalletWorksheetUpload()">
+                <span class="glyphicon glyphicon-upload"></span> Upload Pallet Worksheet </button>
+        </div>
+      </div>
+      <div>
+        Pallet Worksheet PDF Upload progress: {{getPalletWorksheetProgress()}}%
+        <div class="progress" style="margin-top: 5px; width: 75%">
+          <div class="progress-bar" role="progressbar" [ngStyle]="{ 'width': getPalletWorksheetProgress() + '%'}"></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-8 col-sm-9 col-md-6 col-lg-6">
+      <div class="table-responsive">
+        <!--<p><i class="fa fa-file-pdf-o" aria-hidden="true"></i> File Information:</p>-->
+        <button style="margin-bottom: 5px;" type="button" class="btn btn-danger btn-xs" (click)="deleteWorkSheetPDF()"
+            [disabled]="enablePalletWorksheetDelete()">
+            <span class="glyphicon glyphicon-trash"></span> Delete Pallet Worksheet PDF File</button>
+        <table class="table table-condensed table-bordered">
+          <tr>
+            <td style="width:30%"><b>Current File:</b></td>
+            <td style="width:70%">{{[patternData.currentPalletWorksheetFile]}}</td>
+          </tr>
+          <tr>
+            <td><b>Upload Date/Time:</b></td>
+            <td>{{[patternData.palletWorksheetFileUploadDateTime]}}</td>
+          </tr>
+          <tr>
+            <td><b>User:</b></td>
+            <td>{{[patternData.palletWorksheetFileUser]}}</td>
+          </tr>
+          <tr>
+            <td><b>Download Count:</b></td>
+            <td>{{[patternData.palletWorksheetFileDownloadCount]}}</td>
+          </tr>
+          <tr>
+            <td><b>Replacement Count:</b></td>
+            <td>{{[patternData.palletWorksheetReplacementCount]}}</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal Window -->
+<template #template>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Edit Postal Accounting Notes</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    This is a modal.
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary btn-s" style="margin-top: 0px; margin-bottom: 0px;" (click)="modalRef.hide()">
+      <span class="glyphicon glyphicon-save"></span> Save</button>
+  </div>
+</template>
