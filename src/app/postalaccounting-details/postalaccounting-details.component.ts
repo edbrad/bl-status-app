@@ -28,6 +28,8 @@ export class PostalaccountingDetailsComponent implements OnInit, OnDestroy {
   // selected pattern's details
   patternCode: string = "";
   patternData: any = {};
+  postalAccountingNotes: string = "";
+  status: string = "";
 
   // modal window reference
   public modalRef: BsModalRef;
@@ -133,7 +135,7 @@ export class PostalaccountingDetailsComponent implements OnInit, OnDestroy {
       this.uploaderPalletTags.options.additionalParameter['serverFilePath'] = this.serverFilePath;
       this.uploaderPalletTags.options.additionalParameter['filePostDateTime'] = moment().format();
       this.uploaderPalletTags.options.additionalParameter['downloadCount'] = 0;
-      this.uploaderPalletTags.options.additionalParameter['replacementCount'] = this.checkReplacementCount(this.currentPalletTagPattern, file.file.name);
+      this.uploaderPalletTags.options.additionalParameter['replacementCount'] = this.checkReplacementCount("Pallet Tags");
     };
 
     // override Pallet Tags progress bar method - to set progress for the appropriate pattern
@@ -161,7 +163,7 @@ export class PostalaccountingDetailsComponent implements OnInit, OnDestroy {
       this.uploaderPalletWorksheets.options.additionalParameter['serverFilePath'] = this.serverFilePath;
       this.uploaderPalletWorksheets.options.additionalParameter['filePostDateTime'] = moment().format();
       this.uploaderPalletWorksheets.options.additionalParameter['downloadCount'] = 0;
-      this.uploaderPalletWorksheets.options.additionalParameter['replacementCount'] = this.checkReplacementCount(this.pattern, file.file.name);
+      this.uploaderPalletWorksheets.options.additionalParameter['replacementCount'] = this.checkReplacementCount("Pallet Worksheet");
     };
 
     // override Pallet Worksheet progress bar method - to set progress for the appropriate pattern
@@ -187,6 +189,8 @@ export class PostalaccountingDetailsComponent implements OnInit, OnDestroy {
     this.ds.getAPattern(pattern).subscribe((data => {
       // hold data from database
       this.patternData = data;
+      this.postalAccountingNotes = this.patternData.postalAccountingNotes;
+      this.status = this.patternData.paperworkStatus;
       console.log("pattern data: " + JSON.stringify(this.patternData));
     }))
   }
@@ -260,15 +264,29 @@ export class PostalaccountingDetailsComponent implements OnInit, OnDestroy {
   /**
    * @method checkReplacementCount
    * @description check for existing file and return the replacement count
-   * @param pattern the given pattern to check
-   * @param fileName the given file name to check
+   * @param fileType the given file type to check (Pallet/Worksheet)
    */
-  checkReplacementCount(pattern: string, fileName: string){
-    // TODO: check for exiting file in database (file catalog) and filesystem; iterate replacement
-    // count accordingly
-
-    // return the existing replacement count
-    return 0;
+  checkReplacementCount(fileType: string) {
+    if (fileType == "Pallet Tags") {
+      if ((this.patternData.currentPalletTagFile != "") && (this.patternData.currentPalletTagFile != " ")) {
+        // log the event
+        this.toastr.warning('You are about to replace File: ' + this.patternData.currentPalletTagFile + '! ', 'bl-status: FileUploader');
+        // return the updated replacement count
+        console.log("new count: " + parseInt(this.patternData.palletTagReplacementCount) + 1);
+        return parseInt(this.patternData.palletTagReplacementCount) + 1;
+      } else {
+        return 0;
+      }
+    } else {
+      if ((this.patternData.currentPalletWorksheetFile != "") && (this.patternData.currentPalletWorksheetFile != " ")) {
+        // log the event
+        this.toastr.warning('You are about to replace File: ' + this.patternData.currentPalletWorksheetFile + '! ', 'bl-status: FileUploader');
+        // return the updated replacement count
+        return parseInt(this.patternData.palletWorksheetReplacementCount) + 1;
+      } else {
+        return 0;
+      }
+    }
   }
 
   /**
@@ -352,6 +370,63 @@ export class PostalaccountingDetailsComponent implements OnInit, OnDestroy {
    */
   public editAccountingNotes(template: TemplateRef<any>) {
     this.modalRef = this.modalService.show(template);
+  }
+
+  /**
+   *
+   */
+  public saveAccountingNotes(){
+    console.log("notes: " + this.postalAccountingNotes);
+    var data = {
+      "postalAccountingNotes" : this.postalAccountingNotes
+    }
+    var response = this.ds.updateStatusByPattern(this.patternData.pattern, data)
+    .subscribe((data => {
+      console.log("Note response: " + response);
+      this.getPatternData(this.patternCode);
+      // log the event
+      this.logger.addToLog("INFO", "Postal Accouting Notes Updated: " +
+      this.postalAccountingNotes +
+      " User: " + this.user).subscribe((data => {
+          const ack = data;
+          if (!ack) {
+            this.toastr.error('Logging Error!', 'bl-status: Logging Service');
+          }
+        }));
+      this.modalRef.hide()
+      this.toastr.success('Postal Accouting Notes Updated!', 'bl-status: Data Service');
+      this.getPatternData(this.patternCode);
+    }))
+  }
+
+  /**
+   *
+   */
+  clearPostalAccoutingNotes(){
+    this.postalAccountingNotes = "";
+  }
+
+  /**
+   *
+   */
+  refreshPatternData(){
+    this.getPatternData(this.patternCode);
+  }
+
+  /**
+   *
+   * @param status
+   */
+  checkBadgeProgress(status: string){
+    console.log("status: " + status);
+    console.log("paperwork status: " + this.status);
+    if (this.status == status){
+      console.log("return: false");
+      return 0;
+    } else {
+      console.log("return: true");
+      return 1;
+    }
   }
 
   /**

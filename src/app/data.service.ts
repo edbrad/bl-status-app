@@ -72,6 +72,24 @@ export class DataService {
   }
 
   /**
+   *
+   * @param pattern
+   * @param update
+   */
+  updateStatusByPattern(pattern: string, update: object){
+    console.log("update DS!");
+    var headers = new Headers({ 'Content-Type': 'application/json' });
+    var options = new RequestOptions({ headers: headers });
+    const url = this.urlRoot + '/update-many-by-pattern/';
+    var data = {
+      update_pattern: pattern,
+      update_data: update
+    };
+    return this.http.put(url, data, options)
+      .map((response: Response) => response.json());
+  }
+
+  /**
    * @method deleteWorksheetPDF
    * @description call API to delete Pallet Worksheet PDF file from server and update status
    * @param pattern the given pattern that is associated with the given file

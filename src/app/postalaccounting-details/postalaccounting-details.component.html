@@ -1,7 +1,12 @@
 <div class="container">
   <h3 style="margin-top: 3px;"><b>bl-status:</b> Postal Accounting Details</h3>
-  <h3 style="margin-bottom: 0px;">Pattern: <span style="color: #3577ba;"><b>{{patternData.pattern}}</b></span></h3>
-  <small><a routerLink="/postalaccounting">BACK TO PATTERNS</a></small>
+  <h3 style="margin-bottom: 0px;">Pattern: <span style="color: #3577ba;"><b>{{patternData.pattern}}</b></span>
+    <span class="badge">{{patternData.paperworkStatus}}</span>
+  </h3>
+  <small>
+    <a routerLink="/postalaccounting">BACK TO PATTERNS</a> |
+    <a [routerLink]=[] (click)="refreshPatternData()">Refresh Data</a>
+  </small>
   <div style="margin-top: 10px; margin-bottom: 2px;">
     <table class="table table-condensed table-bordered table-responsive">
       <tr>
@@ -32,7 +37,7 @@
         <td class="col-md-2 col-sm-1"><b>Sample Note(s):</b></td>
         <td class="col-md-4 col-sm-2">--</td>
         <td class="col-md-2 col-sm-1"><b>Accounting Note(s):</b></td>
-        <td class="col-md-4 col-sm-2">--</td>
+        <td class="col-md-4 col-sm-2">{{patternData.postalAccountingNotes}}</td>
       </tr>
     </table>
     <button type="button" class="btn btn-primary btn-s" style="margin-top: 0px; margin-bottom: 0px;" (click)="editAccountingNotes(template)">
@@ -153,10 +158,13 @@
     </button>
   </div>
   <div class="modal-body">
-    This is a modal.
+    <small style="color: #3577ba;">Add/Edit/Update Note(s):</small><br>
+    <textarea ref-textarea [(ngModel)]="postalAccountingNotes" rows="4" cols="68"></textarea>
   </div>
   <div class="modal-footer">
-    <button type="button" class="btn btn-primary btn-s" style="margin-top: 0px; margin-bottom: 0px;" (click)="modalRef.hide()">
+    <button type="button" class="btn btn-danger btn-s" style="margin-top: 0px; margin-bottom: 0px;"(click)="clearPostalAccoutingNotes()">
+        <span class="glyphicon glyphicon-trash"></span> Clear</button>
+    <button type="button" class="btn btn-primary btn-s" style="margin-top: 0px; margin-bottom: 0px;" (click)="saveAccountingNotes()">
       <span class="glyphicon glyphicon-save"></span> Save</button>
   </div>
 </template>
