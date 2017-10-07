@@ -21,6 +21,7 @@ import { DataService } from '../data.service';
 export class PostalaccountingComponent implements OnInit {
 
   // misc variables
+  isDataLoaded:boolean = false;
   logoImagePath: string = "../assets/EMS_Envelope_T.png";
   filterText: string = null;
   isLetterFilterChecked: boolean = false;
@@ -454,6 +455,8 @@ export class PostalaccountingComponent implements OnInit {
 
     // get all statuses from the external REST API
     this.ds.getAllStatuses().subscribe((data => {
+      // clear loading indicator
+      this.isDataLoaded = true;
       // save data from database
       this.rows = data;
       // cache data for filtering

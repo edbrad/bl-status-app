@@ -1,14 +1,17 @@
 declare var pdfMake: any; /** prevent TypeScript typings error when using non-TypeSCript Lib (pdfmake) */
 declare var moment: any;  /** prevent TypeScript typings error when using non-TypeSCript Lib (momentJS) */
-//
+// Angular 2/4 native libraries
 import { Component, OnInit, ViewEncapsulation, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map'
-//
+
+// 3rd-party/open-source components
 import { DaterangepickerConfig } from 'ng2-daterangepicker';
 import { DaterangePickerComponent } from 'ng2-daterangepicker';
 import { ToastrService } from 'ngx-toastr';
-//
+import { SelectModule } from 'ng2-select';
+
+// custom services
 import { DataService } from '../data.service';
 import { LoggingService } from '../logging.service';
 
@@ -21,19 +24,20 @@ import { LoggingService } from '../logging.service';
 export class HomeComponent implements OnInit {
 
   // misc variables
+  isDataLoaded: boolean = false;
   logoImagePath: string = "../assets/EMS_Envelope_T.png";
   filterText: string = null;
-  isLetterFilterChecked: boolean = false;
-  isFlatFilterChecked: boolean = false;
-  isCompleteFilterChecked: boolean = false;
   lastRefreshDate: Date = moment();
+  pieceTypes:Array<string> = ['Letter', 'Flat'];
+  statuses:Array<string> = ['New', 'In Process', 'Issue', 'Replacement', 'Complete'];
+  selectedFilterPieceType: string = null;
+  selectedFilterStatus: string = null;
 
   // ChartJS parameters
   public lineChartLegend: boolean = true;
   public lineChartType: string = 'line';
   public lineChartData: Array<any> = [
-    { data: [20, 21, 28, 32, 16, 34, 15], label: 'Patterns' },
-    { data: [2892451, 1189472, 789301, 689234, 2127562, 978301, 393781], label: 'Pieces' },
+    { data: [0, 0, 0, 0, 0, 0, 0], label: 'Pieces' },
   ];
   public lineChartLabels: Array<any> = ['Today', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'];
   public lineChartOptions: any = {
@@ -66,7 +70,7 @@ export class HomeComponent implements OnInit {
     }
   ];
 
-  // datepicker - date range (ng2-daterangepicker)
+  // datepicker - date range (ng2-daterangepicker) variables
   @ViewChild(DaterangePickerComponent)
   private picker: DaterangePickerComponent;
   public daterange: any = {};
@@ -112,6 +116,8 @@ export class HomeComponent implements OnInit {
    * @constructor
    * @param ds data service dependency (makes REST API calls)
    * @param toastr pop-up notification dependency
+   * @param logger logging service dependency
+   * @param daterangepickerOptions Date Range Picker config
    */
   constructor(private ds: DataService,
     private toastr: ToastrService,
@@ -155,15 +161,16 @@ export class HomeComponent implements OnInit {
   }
 
   /**
-   * @method buildPiecePatternChart
-   * @description collect data for 7-day Piece/Pattern Drop Chart
+   * @method buildPieceChart
+   * @description collect data for 7-day Piece Drop Chart
    */
-  buildPiecePatternChart() {
+  buildPieceChart() {
+    // work variables
     var days: Array<any> = [];
     var dayLabels: Array<any> = [];
     var dayPieces: Array<any> = [];
     var pieces: Array<any> = [0, 0, 0, 0, 0, 0, 0];
-    var patterns: Array<any> = [0, 0, 0, 0, 0, 0, 0];
+
     // get date range (7 days).
     days[0] = moment();
     days[1] = moment().add(1, 'days');
@@ -187,63 +194,62 @@ export class HomeComponent implements OnInit {
       // tally piece amounts for each day
       for (var j = 0; j < dayPieces.length; j++) {
         pieces[i] += parseInt(dayPieces[j].total);
-        patterns[i] += 1;
       }
     }
     for (var k = 0; k < days.length; k++) {
       dayLabels[k] = moment(days[k]).format("MM/DD");
     }
     // apply data to chart
-    //dayLabels.unshift(" ");
-    //patterns.unshift("patterns: ");
-    //pieces.unshift("pieces: ")
-    this.lineChartData[0] = { data: patterns, label: "Pattern Count" };
-    this.lineChartData[1] = { data: pieces, label: "Piece Count" };
+    this.lineChartData[0] = { data: pieces, label: "Piece Count" };
     this.lineChartLabels = dayLabels;
   }
 
   /**
-   * @method checkLettersFilter
-   * @description respond to letter checkbox filter -  check event
-   * @param  $event check event
+   * @method pieceTypeSelected
+   * @desc apply piece type filter selection
+   * @param {any} value the selected piece type filter value
    */
-  checkLettersFilter($event) {
-    this.isLetterFilterChecked = !this.isLetterFilterChecked;
-    if (this.isFlatFilterChecked) {
-      this.isFlatFilterChecked = false;
-    }
+  pieceTypeFilterSelected(value: any) {
+    this.selectedFilterPieceType = value.text;
     this.refreshStatusData();
   }
 
   /**
-   * @method checkFlatsFilter
-   * @description respond to flat checkbox filter -  check event
-   * @param  $event check event
+   * @method pieceTypeRemoved
+   * @desc remove piece type filter selection
+   * @param {any} value
    */
-  checkFlatsFilter($event) {
-    this.isFlatFilterChecked = !this.isFlatFilterChecked;
-    if (this.isLetterFilterChecked) {
-      this.isLetterFilterChecked = false;
-    }
+  pieceTypeFilterRemoved(value: any) {
+    this.selectedFilterPieceType = null;
     this.refreshStatusData();
   }
 
   /**
-   * @method checkCompleteFilter
-   * @description respond to flat checkbox filter -  check event
-   * @param  $event check event
+   * @method statusSelected
+   * @desc apply status filter selection
+   * @param {any} value
    */
-  checkCompleteFilter($event) {
-    this.isCompleteFilterChecked = !this.isCompleteFilterChecked;
+  statusFilterSelected(value: any) {
+    this.selectedFilterStatus = value.text;
+    this.refreshStatusData();
+  }
+
+  /**
+   * @method statusRemoved
+   * @desc remove status filter selection
+   * @param {any} value
+   */
+  statusFilterRemoved(value: any) {
+    this.selectedFilterStatus = null;
     this.refreshStatusData();
   }
 
   /**
    * @method isComplete
    * @description determine if all tasks are done (sample & paperwork)
-   * @param sampleStatus
-   * @param paperworkStatus
-   * @returns true/false
+   * @param {string} sampleStatus
+   * @param {string} paperworkStatus
+   * @returns {boolean} true/false
    */
   isComplete(sampleStatus: string, paperworkStatus: string) {
     if (sampleStatus == "Complete" && paperworkStatus == "Complete") {
@@ -257,7 +263,7 @@ export class HomeComponent implements OnInit {
   /**
    * @method updatePatternFilter
    * @description filter rows (patterns) as user types
-   * @param event key-up event from the filter field
+   * @param {event} event key-up event from the filter field
    */
   updatePatternFilter(event) {
     const val = event.target.value.toLowerCase();
@@ -279,16 +285,22 @@ export class HomeComponent implements OnInit {
    */
   refreshStatusData() {
     // get all statuses from the external REST API
-    var textFilter: any[] = [];
-    var dateFilter: any[] = [];
-    var pieceFilter: any[] = [];
-    var completeFilter: any[] = [];
+    var textFilter: any[] = [];     /* Text Box filter data bucket */
+    var dateFilter: any[] = [];     /* Drop Date Range filter data bucket */
+    var pieceFilter: any[] = [];    /* Piece Type filter data bucket */
+    var statusFilter: any[] = [];   /* Status filter data bucket */
+    var pieceType: string = null;   /* selected piece type (letter/flat) filter */
+    var status: string = null;      /* selected status filter */
+    // show loading indicator
+    this.isDataLoaded = false;
     this.ds.getAllStatuses().subscribe((data => {
+      // clear loading indicator
+      this.isDataLoaded = true;
       // save data from database
       this.rows = data;
-      // cache data for filtering
-      this.temp = [...data];
-      this.temp2 = [...data];
+      // cache data for datatable filtering & charting
+      this.temp = [...data];    /** datatable */
+      this.temp2 = [...data];   /** charting */
 
       // filter pattern code
       if (this.filterText != null) {
@@ -298,11 +310,11 @@ export class HomeComponent implements OnInit {
         });
       }
       else {
-        // pass-through - no filter needed
+        // pass-through - no filter text entered
         textFilter = [...this.temp];
       }
 
-      // filter drop date
+      // filter drop date range
       if (this.daterange.start && this.daterange.end) {
         var s = this.daterange.start;
         var e = this.daterange.end;
@@ -320,25 +332,16 @@ export class HomeComponent implements OnInit {
         });
       }
       else {
-        // pass-through - no filter needed
+        // pass-through - no drop date range selected
         dateFilter = [...textFilter]
       }
 
       // filter piece type
-      if (this.isLetterFilterChecked && !this.isFlatFilterChecked) {
-
+      if (this.selectedFilterPieceType) {
+        console.log("filter piece type: " + this.selectedFilterPieceType);
+        pieceType = this.selectedFilterPieceType;
         pieceFilter = dateFilter.filter(function (d) {
-          if (d.type == "Letter") {
-            return true;
-          }
-          else {
-            return false;
-          }
-        });
-      }
-      else if (this.isFlatFilterChecked && !this.isLetterFilterChecked) {
-        pieceFilter = dateFilter.filter(function (d) {
-          if (d.type == "Flat") {
+          if (d.type == pieceType) {
             return true;
           }
           else {
@@ -347,43 +350,59 @@ export class HomeComponent implements OnInit {
         });
       }
       else {
-        // pass-through - no filter needed
+        // pass-through - no piece type filter selected
         pieceFilter = [...dateFilter]
       }
 
-      // filter complete status
-      if (this.isCompleteFilterChecked) {
-        completeFilter = [...pieceFilter]
-        completeFilter = pieceFilter.filter(function (d) {
-          if (d.sampleStatus == "Complete" && d.paperworkStatus == "Complete") {
-            return true;
+      // filter status
+      if (this.selectedFilterStatus) {
+        console.log("filter status: " + this.selectedFilterStatus);
+        status = this.selectedFilterStatus
+        statusFilter = pieceFilter.filter(function (d) {
+          if (status == "Complete") {
+            /* both sample and paperwork have to be complete to be considered "Complete" */
+            if (d.sampleStatus == status && d.paperworkStatus == status) {
+              return true;
+            }
+            else {
+              return false;
+            }
           }
           else {
-            return false;
+            /* for other statuses (In Process, Issue, etc..), either sample or paperwork can be
+            a match to be considered the given status */
+            if (d.sampleStatus == status || d.paperworkStatus == status) {
+              return true;
+            }
+            else {
+              return false;
+            }
           }
         });
       }
       else {
-        // pass-through - no filter needed
-        completeFilter = [...pieceFilter]
+        // pass-through - no status filter selected
+        statusFilter = [...pieceFilter]
       }
 
       // finally, update the rows to be displayed
-      this.rows = completeFilter;
+      this.rows = statusFilter;
 
       // whenever the filter changes, always go back to the first page
       this.table.offset = 0;
+
+      // update last refresh time display
       this.lastRefreshDate = moment();
 
       // build chart data
-      this.buildPiecePatternChart();
+      this.buildPieceChart();
     }));
   }
 
   /**
    * @method onPage
    * @description capture data-table paging events
-   * @param event
+   * @param {event} event
    */
   onPage(event) {
     clearTimeout(this.timeout);
@@ -394,16 +413,16 @@ export class HomeComponent implements OnInit {
   /**
    * @method toggleExpandRow
    * @description toggle selected row detail view open and closed
-   * @param row the selected row
+   * @param {any} row the selected row
    */
-  toggleExpandRow(row) {
+  toggleExpandRow(row: any) {
     this.table.rowDetail.toggleExpandRow(row);
   }
 
   /**
    * @method onDetailToggle
    * @description capture row detail toggle event
-   * @param event the given toggle even
+   * @param {event} event the given toggle even
    */
   onDetailToggle(event) {
     // TODO:???
@@ -412,7 +431,7 @@ export class HomeComponent implements OnInit {
   /**
    * @method printJobTicket
    * @description generate a PDF of the EMS Job Ticket (using pdfMake Library)
-   * @param pattern the selected pattern
+   * @param {string} pattern the given pattern
    */
   private printJobTicket(pattern: string) {
     this.aClient = "sample";
@@ -1239,9 +1258,9 @@ export class HomeComponent implements OnInit {
   /**
    * @method getPaperworkCellClass
    * @description apply background color (css class) based on status value
-   * @param row current table row
-   * @param column currrent table column
-   * @param value current cell value
+   * @param {any} row current table row
+   * @param {any} column currrent table column
+   * @param {any} value current cell value
    * @returns object class containing css classes to be applied based on value
    */
   private getPaperworkCellClass({ row, column, value }): any {

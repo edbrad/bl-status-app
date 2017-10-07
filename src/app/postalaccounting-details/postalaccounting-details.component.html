@@ -1,7 +1,10 @@
-<div class="container">
+<div *ngIf="isDataLoaded" class="container">
+  <ngx-loading [show]="!isDataLoaded" [config]="{ backdropBorderRadius: '14px' }"></ngx-loading>
   <h3 style="margin-top: 3px;"><b>bl-status:</b> Postal Accounting Details</h3>
   <h3 style="margin-bottom: 0px;">Pattern: <span style="color: #3577ba;"><b>{{patternData.pattern}}</b></span>
-    <span class="badge">{{patternData.paperworkStatus}}</span>
+    <span *ngIf="checkBadgeStatus('New')" class="badge">New</span>
+    <span *ngIf="checkBadgeStatus('In Process')" class="badge badge-info">In Process</span>
+    <span *ngIf="checkBadgeStatus('Complete')" class="badge badge-success">Complete!</span>
   </h3>
   <small>
     <a routerLink="/postalaccounting">BACK TO PATTERNS</a> |
@@ -159,7 +162,7 @@
   </div>
   <div class="modal-body">
     <small style="color: #3577ba;">Add/Edit/Update Note(s):</small><br>
-    <textarea ref-textarea [(ngModel)]="postalAccountingNotes" rows="4" cols="68"></textarea>
+    <textarea ref-textarea [(ngModel)]="postalAccountingNotes" rows="4" cols="87"></textarea>
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-danger btn-s" style="margin-top: 0px; margin-bottom: 0px;"(click)="clearPostalAccoutingNotes()">

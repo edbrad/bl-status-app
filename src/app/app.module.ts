@@ -12,6 +12,8 @@ import { ToastrModule } from 'ngx-toastr';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { ChartsModule } from 'ng2-charts';
 import { FileSelectDirective } from 'ng2-file-upload';
+import { LoadingModule, ANIMATION_TYPES } from 'ngx-loading';
+import { SelectModule } from 'ng2-select';
 
 // custom services
 import { AuthenticationService } from './auth/auth.service';
@@ -66,6 +68,16 @@ import { AddCommasPipe } from './add-commas.pipe';
     Daterangepicker,
     ChartsModule,
     ModalModule.forRoot(),
+    LoadingModule.forRoot({
+      animationType: ANIMATION_TYPES.threeBounce,
+      backdropBackgroundColour: 'rgba(0,0,0,0.1)',
+      backdropBorderRadius: '4px',
+      fullScreenBackdrop: true,
+      primaryColour: '#ffffff',
+      secondaryColour: '#ffffff',
+      tertiaryColour: '#ffffff'
+  }),
+    SelectModule,
   ],
   providers: [
     AuthGuard,

@@ -1,10 +1,11 @@
 <div class="container">
+  <ngx-loading [show]="!isDataLoaded"></ngx-loading>
   <div class="starter-template">
     <img [src]="logoImagePath" alt="EMS Logo" width="105" height="60">
     <h3 style="margin-top: 3px;"><b>bl-status:</b> EMS Box Loading Status Tracking System</h3>
   </div>
   <hr>
-  <h4 class="text-muted"># of Pieces and Patterns maling the next 7 days</h4>
+  <h4 class="text-muted"># of Pieces for Direct Dropship - next 7 days</h4>
   <div class="row">
     <div class="col-md-6">
       <div style="display: block;">
@@ -51,21 +52,25 @@
         <input type="text" name="daterangeInput" daterangepicker [options]="options" (selected)="selectedDate($event, daterange)"
           class="input" style="padding:7px;" />
       </div>
-      <!-- checkboxes -->
-      <span style='padding:8px;margin:5px; float: right;'>
-      <div class="form-check form-check-inline">
-          <span>Show Only: </span>
-      <label class="checkbox-inline">
-          <input type="checkbox" [checked]="isLetterFilterChecked" (change)="checkLettersFilter($event)">Letters
-        </label>
-      <label class="checkbox-inline">
-          <input type="checkbox" [checked]="isFlatFilterChecked" (change)="checkFlatsFilter($event)">Flats
-        </label>
-      <label class="checkbox-inline">
-          <input type="checkbox" [checked]="isCompleteFilterChecked" (change)="checkCompleteFilter($event)">Complete
-        </label>
-    </div>
-    </span>
+      <!-- select filters -->
+      <span style='padding:8px;margin:0px;width:25%;float:left;'>
+        <ng-select
+          [allowClear]="true"
+          [items]="pieceTypes"
+          (selected)="pieceTypeFilterSelected($event)"
+          (removed)="pieceTypeFilterRemoved($event)"
+          placeholder="Piece Type Filter">
+        </ng-select>
+        </span>
+        <span style='padding:8px;margin:0px;width:25%;float:right;'>
+        <ng-select
+          [allowClear]="true"
+          [items]="statuses"
+          (selected)="statusFilterSelected($event)"
+          (removed)="statusFilterRemoved($event)"
+          placeholder="Status Filter">
+      </ng-select>
+      </span>
   </div>
 </div>
 <div style="text-align: left;color: #3577ba;"><small><b>data last refreshed @:</b> {{this.lastRefreshDate}}</small></div>

@@ -25,6 +25,8 @@ export class PostalaccountingDetailsComponent implements OnInit, OnDestroy {
 
   private subscription: any;    /** the Observable subscription to the routing Service */
 
+  isDataLoaded: boolean = false;
+
   // selected pattern's details
   patternCode: string = "";
   patternData: any = {};
@@ -191,6 +193,7 @@ export class PostalaccountingDetailsComponent implements OnInit, OnDestroy {
       this.patternData = data;
       this.postalAccountingNotes = this.patternData.postalAccountingNotes;
       this.status = this.patternData.paperworkStatus;
+      this.isDataLoaded = true;
       console.log("pattern data: " + JSON.stringify(this.patternData));
     }))
   }
@@ -417,17 +420,14 @@ export class PostalaccountingDetailsComponent implements OnInit, OnDestroy {
    *
    * @param status
    */
-  checkBadgeProgress(status: string){
-    console.log("status: " + status);
-    console.log("paperwork status: " + this.status);
+  checkBadgeStatus(status: string){
     if (this.status == status){
-      console.log("return: false");
-      return 0;
+      return true;
     } else {
-      console.log("return: true");
-      return 1;
+      return false;
     }
   }
+
 
   /**
    * @method ngOnDestroy
