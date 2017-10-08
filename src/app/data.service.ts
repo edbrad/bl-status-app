@@ -14,15 +14,18 @@ export class DataService {
   constructor(private http: Http, private authenticationService: AuthenticationService) { }
 
   // bl-status API endpoint root URL
-  urlRoot: string = 'http://172.16.248.19:8080/api'; // test
-  // pyACCESS (Job Ticket) API endpoint root URL
-  urlJTRoot: string = 'http://172.16.44.21'; // prod
+  public urlRoot: string = 'http://172.16.248.19:8080/api'; // test
+  //public urlRoot: string = 'http://172.16.248.19:8080/api'; // prod
+
+  // pyACCESS (Job Ticket MS ACCESS db access) API endpoint root URL
+  public urlJTRoot: string = 'http://172.16.44.21'; // prod
+  //public urlJTRoot: string = 'http://172.16.44.21'; // test
 
   /**
    * @method apiTest
-   * @description connect to bl-status API test endpoint
+   * @desc connect to bl-status API test endpoint
    */
-  apiTest() {
+  public apiTest() {
     const url = this.urlRoot + '/';
     // create an Observable for the HTTP/REST API call and transform (map) the response to a JSON array
     return this.http.get(url)
@@ -31,9 +34,9 @@ export class DataService {
 
   /**
    * @method getAllStatuses
-   * @description get all the status records/documents from the bl-status API
+   * @desc get all the status records/documents from the bl-status API
    */
-  getAllStatuses() {
+  public getAllStatuses() {
     const url = this.urlRoot + '/all-statuses/';
     // create an Observable for the HTTP/REST API call and transform (map) the response to a JSON array
     return this.http.get(url)
@@ -42,9 +45,10 @@ export class DataService {
 
   /**
    * @method getAPattern
-   * @description get a single record/document by the pattern code (9999-99x) from the bl-status API
+   * @desc get a single record/document by the pattern code (9999-99x) from the bl-status API
+   * @param {string} pattern the given pattern
    */
-  getAPattern(pattern: string) {
+  public getAPattern(pattern: string) {
     const url = this.urlRoot + '/find-one-by-pattern/?pattern=' + pattern;
     // create an Observable for the HTTP/REST API call and transform (map) the response to a JSON array
     return this.http.get(url)
@@ -53,12 +57,12 @@ export class DataService {
 
   /**
    * @method deletePalletPDF
-   * @description call API to delete Pallet Tag PDF file from server and update status
-   * @param pattern the given pattern that is associated with the given file
-   * @param file the given file name for the given pattern
+   * @desc call API to delete Pallet Tag PDF file from server and update status
+   * @param {string} pattern the given pattern that is associated with the given file
+   * @param {string} file the given file name for the given pattern
    */
-  deletePalletPDF(pattern: string, fileName: string){
-    console.log("file-delete DS!");
+  public deletePalletPDF(pattern: string, fileName: string){
+    //console.log("file-delete DS!");
     var headers = new Headers({ 'Content-Type': 'application/json' });
     var options = new RequestOptions({ headers: headers });
     const url = this.urlRoot + '/file-delete/';
@@ -72,12 +76,13 @@ export class DataService {
   }
 
   /**
-   *
-   * @param pattern
-   * @param update
+   * @method updateStatusByPattern
+   * @desc generic update status data by pattern code
+   * @param {string} pattern given pattern code
+   * @param {object} update given data to be updated
    */
-  updateStatusByPattern(pattern: string, update: object){
-    console.log("update DS!");
+  public updateStatusByPattern(pattern: string, update: object){
+    //console.log("update DS!");
     var headers = new Headers({ 'Content-Type': 'application/json' });
     var options = new RequestOptions({ headers: headers });
     const url = this.urlRoot + '/update-many-by-pattern/';
@@ -92,11 +97,11 @@ export class DataService {
   /**
    * @method deleteWorksheetPDF
    * @description call API to delete Pallet Worksheet PDF file from server and update status
-   * @param pattern the given pattern that is associated with the given file
-   * @param file the given file name for the given pattern
+   * @param {string} pattern the given pattern that is associated with the given file
+   * @param {string} file the given file name for the given pattern
    */
-  deleteWorksheetPDF(pattern: string, fileName: string){
-    console.log("file-delete DS!");
+  public deleteWorksheetPDF(pattern: string, fileName: string){
+    //console.log("file-delete DS!");
     var headers = new Headers({ 'Content-Type': 'application/json' });
     var options = new RequestOptions({ headers: headers });
     const url = this.urlRoot + '/file-delete/';
@@ -112,9 +117,9 @@ export class DataService {
   /**
    * @method getAJob
    * @description get job information for a single job from the pyACCESS (Job Ticket) API
-   * @param jobnum the given EMS Job number
+   * @param {string} jobnum the given EMS Job number
    */
-  getAJob(jobnum) {
+  public getAJob(jobnum: string) {
     const url = this.urlJTRoot + '/api/jobnum-search?jobnum=' + jobnum;
     // create an Observable for the HTTP/REST API call and transform (map) the response to a JSON array
     return this.http.get(url)
@@ -125,7 +130,7 @@ export class DataService {
    * @method getClients
    * @description get all the clients from the pyACCESS (Job Ticket) API
    */
-  getClients() {
+  public getClients() {
     const url = this.urlJTRoot + '/api/companies';
     // create an Observable for the HTTP/REST API call and transform (map) the response to a JSON array
     return this.http.get(url)
@@ -135,9 +140,9 @@ export class DataService {
   /**
    * @method getJobDetails
    * @description get all the Job Details (patterns) for a given job from the pyACCESS (Job Ticket) API
-   * @param jobnum provided Job Number
+   * @param {string} jobnum provided Job Number
    */
-  getJobDetails(jobnum) {
+  public getJobDetails(jobnum: string) {
     const url = this.urlJTRoot + '/api/jobdetails?jobnum=' + jobnum;
     // create an Observable for the HTTP/REST API call and transform (map) the response to a JSON array
     return this.http.get(url)

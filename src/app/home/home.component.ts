@@ -24,14 +24,14 @@ import { LoggingService } from '../logging.service';
 export class HomeComponent implements OnInit {
 
   // misc variables
-  isDataLoaded: boolean = false;
-  logoImagePath: string = "../assets/EMS_Envelope_T.png";
-  filterText: string = null;
-  lastRefreshDate: Date = moment();
-  pieceTypes:Array<string> = ['Letter', 'Flat'];
-  statuses:Array<string> = ['New', 'In Process', 'Issue', 'Replacement', 'Complete'];
-  selectedFilterPieceType: string = null;
-  selectedFilterStatus: string = null;
+  public isDataLoaded: boolean = false;
+  public logoImagePath: string = "../assets/EMS_Envelope_T.png";
+  public filterText: string = null;
+  public lastRefreshDate: Date = moment();
+  public pieceTypes:Array<string> = ['Letter', 'Flat'];
+  public statuses:Array<string> = ['New', 'In Process', 'Issue', 'Replacement', 'Complete'];
+  public selectedFilterPieceType: string = null;
+  public selectedFilterStatus: string = null;
 
   // ChartJS parameters
   public lineChartLegend: boolean = true;
@@ -75,42 +75,40 @@ export class HomeComponent implements OnInit {
   private picker: DaterangePickerComponent;
   public daterange: any = {};
   public selectedDate(value: any, datepicker?: any) {
-    // this is the date the user selected
     //console.log("date value: " + JSON.stringify(value));
-
-    // any object can be passed to the selected event and it will be passed back here
+    // save selected date range
     datepicker.start = value.start;
     datepicker.end = value.end;
 
-    // or manupulate internal property
+    // manupulate internal date properties
     this.daterange.start = value.start;
     this.daterange.end = value.end;
     this.daterange.label = value.label;
 
-    // refresh data
+    // refresh data (update UI)
     this.refreshStatusData();
   }
 
   // data-table variables (ngx-datatable)
-  rows: any[] = [];
-  temp = []
-  temp2 = [];
-  data = [];
-  expanded: any = {};
-  timeout: any;
+  public rows: any[] = [];
+  public temp = []
+  public temp2 = [];
+  public data = [];
+  public expanded: any = {};
+  public timeout: any;
   @ViewChild('homeTable') table: any; /** data table html reference */
 
   // job ticket (PDF) variables (pdfmake)
-  pdf: any;                 /** pointer to pdfmake javascript library */
-  company: string = "";
-  jobNumber: string = "";
-  job: any;                 /** the given job information array from the REST query */
-  aJob: any = {};
-  clients: any[] = [];      /** colection of all the Clients from the REST API */
-  aClient: any = {};        /** the client for the given Job (ACCESS data duplication work-around) */
-  aContact: any = {};       /** the specific Contact for the given Job (ACCESS data duplication work-around) */
-  jobPatterns: any[] = [];  /** the pattern details for the given Job */
-  totalQty: number = 0;     /** total pieces */
+  public pdf: any;                 /** pointer to pdfmake javascript library */
+  public company: string = "";
+  public jobNumber: string = "";
+  public job: any;                 /** the given job information array from the REST query */
+  public aJob: any = {};
+  public clients: any[] = [];      /** colection of all the Clients from the REST API */
+  public aClient: any = {};        /** the client for the given Job (ACCESS data duplication work-around) */
+  public aContact: any = {};       /** the specific Contact for the given Job (ACCESS data duplication work-around) */
+  public jobPatterns: any[] = [];  /** the pattern details for the given Job */
+  public totalQty: number = 0;     /** total pieces */
 
   /**
    * @constructor
@@ -164,7 +162,7 @@ export class HomeComponent implements OnInit {
    * @method buildPieceChart
    * @description collect data for 7-day Piece Drop Chart
    */
-  buildPieceChart() {
+  public buildPieceChart() {
     // work variables
     var days: Array<any> = [];
     var dayLabels: Array<any> = [];
@@ -209,7 +207,7 @@ export class HomeComponent implements OnInit {
    * @desc apply piece type filter selection
    * @param {any} value the selected piece type filter value
    */
-  pieceTypeFilterSelected(value: any) {
+  public pieceTypeFilterSelected(value: any) {
     this.selectedFilterPieceType = value.text;
     this.refreshStatusData();
   }
@@ -219,7 +217,7 @@ export class HomeComponent implements OnInit {
    * @desc remove piece type filter selection
    * @param {any} value
    */
-  pieceTypeFilterRemoved(value: any) {
+  public pieceTypeFilterRemoved(value: any) {
     this.selectedFilterPieceType = null;
     this.refreshStatusData();
   }
@@ -229,7 +227,7 @@ export class HomeComponent implements OnInit {
    * @desc apply status filter selection
    * @param {any} value
    */
-  statusFilterSelected(value: any) {
+  public statusFilterSelected(value: any) {
     this.selectedFilterStatus = value.text;
     this.refreshStatusData();
   }
@@ -239,7 +237,7 @@ export class HomeComponent implements OnInit {
    * @desc remove status filter selection
    * @param {any} value
    */
-  statusFilterRemoved(value: any) {
+  public statusFilterRemoved(value: any) {
     this.selectedFilterStatus = null;
     this.refreshStatusData();
   }
@@ -251,7 +249,7 @@ export class HomeComponent implements OnInit {
    * @param {string} paperworkStatus
    * @returns {boolean} true/false
    */
-  isComplete(sampleStatus: string, paperworkStatus: string) {
+  public isComplete(sampleStatus: string, paperworkStatus: string) {
     if (sampleStatus == "Complete" && paperworkStatus == "Complete") {
       return true;
     }
@@ -265,15 +263,16 @@ export class HomeComponent implements OnInit {
    * @description filter rows (patterns) as user types
    * @param {event} event key-up event from the filter field
    */
-  updatePatternFilter(event) {
+  public updatePatternFilter(event) {
     const val = event.target.value.toLowerCase();
     // filter our data
     const temp = this.temp.filter(function (d) {
       return d.pattern.toLowerCase().indexOf(val) !== -1 || !val;
     });
+
+    // refresh data (Update UI)
     this.refreshStatusData();
-    // update the rows
-    //this.rows = temp;
+
     // whenever the filter changes, always go back to the first page
     this.table.offset = 0;
   }
@@ -283,7 +282,7 @@ export class HomeComponent implements OnInit {
    * @description get latest status data from the database and apply any
    * existing filters
    */
-  refreshStatusData() {
+  public refreshStatusData() {
     // get all statuses from the external REST API
     var textFilter: any[] = [];     /* Text Box filter data bucket */
     var dateFilter: any[] = [];     /* Drop Date Range filter data bucket */
@@ -338,7 +337,7 @@ export class HomeComponent implements OnInit {
 
       // filter piece type
       if (this.selectedFilterPieceType) {
-        console.log("filter piece type: " + this.selectedFilterPieceType);
+        //console.log("filter piece type: " + this.selectedFilterPieceType);
         pieceType = this.selectedFilterPieceType;
         pieceFilter = dateFilter.filter(function (d) {
           if (d.type == pieceType) {
@@ -356,7 +355,7 @@ export class HomeComponent implements OnInit {
 
       // filter status
       if (this.selectedFilterStatus) {
-        console.log("filter status: " + this.selectedFilterStatus);
+        //console.log("filter status: " + this.selectedFilterStatus);
         status = this.selectedFilterStatus
         statusFilter = pieceFilter.filter(function (d) {
           if (status == "Complete") {
@@ -404,7 +403,7 @@ export class HomeComponent implements OnInit {
    * @description capture data-table paging events
    * @param {event} event
    */
-  onPage(event) {
+  public onPage(event) {
     clearTimeout(this.timeout);
     this.timeout = setTimeout(() => {
     }, 100);
@@ -415,7 +414,7 @@ export class HomeComponent implements OnInit {
    * @description toggle selected row detail view open and closed
    * @param {any} row the selected row
    */
-  toggleExpandRow(row: any) {
+  public toggleExpandRow(row: any) {
     this.table.rowDetail.toggleExpandRow(row);
   }
 
@@ -424,7 +423,7 @@ export class HomeComponent implements OnInit {
    * @description capture row detail toggle event
    * @param {event} event the given toggle even
    */
-  onDetailToggle(event) {
+  public onDetailToggle(event) {
     // TODO:???
   }
 

@@ -5,6 +5,8 @@
     <span *ngIf="checkBadgeStatus('New')" class="badge">New</span>
     <span *ngIf="checkBadgeStatus('In Process')" class="badge badge-info">In Process</span>
     <span *ngIf="checkBadgeStatus('Complete')" class="badge badge-success">Complete!</span>
+    <span *ngIf="checkBadgeStatus('Replacement')" class="badge badge-warning">Replacement</span>
+    <span *ngIf="checkBadgeStatus('Issue')" class="badge badge-error">Issue!</span>
   </h3>
   <small>
     <a routerLink="/postalaccounting">BACK TO PATTERNS</a> |
@@ -70,7 +72,6 @@
     </div>
     <div class="col-xs-8 col-sm-9 col-md-6 col-lg-6">
       <div class="table-responsive">
-        <!--<p><i class="fa fa-file-pdf-o" aria-hidden="true"></i> File Information:</p>-->
         <button style="margin-bottom: 5px;" type="button" class="btn btn-danger btn-xs" (click)="deletePalletPDF()"
             [disabled]="enablePalletTagsDelete()">
           <span class="glyphicon glyphicon-trash"></span> Delete Pallet Tag PDF File</button>
@@ -122,7 +123,6 @@
     </div>
     <div class="col-xs-8 col-sm-9 col-md-6 col-lg-6">
       <div class="table-responsive">
-        <!--<p><i class="fa fa-file-pdf-o" aria-hidden="true"></i> File Information:</p>-->
         <button style="margin-bottom: 5px;" type="button" class="btn btn-danger btn-xs" (click)="deleteWorkSheetPDF()"
             [disabled]="enablePalletWorksheetDelete()">
             <span class="glyphicon glyphicon-trash"></span> Delete Pallet Worksheet PDF File</button>
@@ -161,6 +161,11 @@
     </button>
   </div>
   <div class="modal-body">
+      <div style="color: red;">
+      <label class="checkbox-inline">
+          <input type="checkbox" [checked]="isAccountingIssueChecked" (change)="checkAccountingIssue($event)"><b>THERE IS AN ISSUE!</b>
+      </label>
+    </div>
     <small style="color: #3577ba;">Add/Edit/Update Note(s):</small><br>
     <textarea ref-textarea [(ngModel)]="postalAccountingNotes" rows="4" cols="87"></textarea>
   </div>

@@ -23,40 +23,42 @@ import { DataService } from '../data.service';
 })
 export class PostalaccountingDetailsComponent implements OnInit, OnDestroy {
 
-  private subscription: any;    /** the Observable subscription to the routing Service */
-
-  isDataLoaded: boolean = false;
+  // misc variables
+  private subscription: any;      /** the Observable subscription to the routing Service */
+  public isDataLoaded: boolean = false;  /** data loading flag - for loading animation */
+  public isAccountingIssueChecked: boolean = false;  /** PostalAccouting Issue flag */
 
   // selected pattern's details
-  patternCode: string = "";
-  patternData: any = {};
-  postalAccountingNotes: string = "";
-  status: string = "";
+  public patternCode: string = "";       /** current Pattern Code */
+  public patternData: any = {};          /** current Patern data */
+  public postalAccountingNotes: string = ""; /** storage for current Pattern Notes/Issues (for updates) */
+  public status: string = "";            /** current Pattern status */
 
   // modal window reference
   public modalRef: BsModalRef;
 
-  // file upload metadata fields (stored in db)
-  pattern = "9999-99X";
-  fileType = "Pallet Tags"
-  user = this.authenticationService.getUsername();
-  clientFilePath = "Client File Path Goes Here...";
-  serverFilePath = "";
-  filePostDateTime = moment().format();
-  downloadCount = 0;
-  replacementCount = 0;
+  // file upload metadata fields (stored in db - file catalog - for download reference)
+  public pattern = "";
+  public fileType = "";
+  public user = this.authenticationService.getUsername();
+  public clientFilePath = "";
+  public serverFilePath = "";
+  public filePostDateTime = moment().format();
+  public downloadCount = 0;
+  public replacementCount = 0;
 
   // file upload progress fields
-  palletTagUploadProgress: any = 0;
-  palletWorksheetUploadProgress: any = 0;
-  currentPalletTagPattern: string = "";
-  currentWorksheetPattern: string = "";
+  public palletTagUploadProgress: any = 0;
+  public palletWorksheetUploadProgress: any = 0;
+  public currentPalletTagPattern: string = "";
+  public currentWorksheetPattern: string = "";
 
   // API url
-  urlRoot: string = 'http://172.16.248.19:8080/api'; // test
+  public urlRoot: string = 'http://172.16.248.19:8080/api'; // test
+  //urlRoot: string = 'http://172.16.248.19:8080/api'; // prod
 
   // intialize Pallet Tag file uploader instance
-  uploaderPalletTags: FileUploader = new FileUploader({
+  public uploaderPalletTags: FileUploader = new FileUploader({
     url: this.urlRoot + "/file-upload/",
     /* file catalog metadata */
     additionalParameter:{
@@ -77,7 +79,7 @@ export class PostalaccountingDetailsComponent implements OnInit, OnDestroy {
   });
 
   // intialize Pallet Worksheet file uploader instance
-  uploaderPalletWorksheets: FileUploader = new FileUploader({
+  public uploaderPalletWorksheets: FileUploader = new FileUploader({
     url: this.urlRoot + "/file-upload/",
     /* file catalog metadata */
     additionalParameter:{
@@ -97,7 +99,15 @@ export class PostalaccountingDetailsComponent implements OnInit, OnDestroy {
     maxFileSize: 100*1024*1024 // 100 MB
   });
 
-  // component constructor
+  /**
+   * @constructor
+   * @param route the current route information
+   * @param logger logging service dependency
+   * @param ds data service dependency
+   * @param toastr pop-up service dependency
+   * @param authenticationService user authentication service dependency
+   * @param modalService modal window service dependency
+   */
   constructor(
     private route: ActivatedRoute,
     private logger: LoggingService,
@@ -148,7 +158,9 @@ export class PostalaccountingDetailsComponent implements OnInit, OnDestroy {
     // post Pallet Tags file upload processing
     this.uploaderPalletTags.onCompleteItem = (item: any, response: any, status: any, headers: any) => {
       this.toastr.success('File Uploaded!', 'bl-status: FileUploader');
+      // clear file from uploader
       this.uploaderPalletTags.removeFromQueue(item);
+      // refresh data (update UI)
       this.getPatternData(this.patternCode);
     };
 
@@ -176,51 +188,60 @@ export class PostalaccountingDetailsComponent implements OnInit, OnDestroy {
     // post Pallet Worksheet file upload processing
     this.uploaderPalletWorksheets.onCompleteItem = (item: any, response: any, status: any, headers: any) => {
       this.toastr.success('File Uploaded!', 'bl-status: FileUploader');
+      // clear file from uploader
       this.uploaderPalletWorksheets.removeFromQueue(item);
+      // refresh data (update UI)
       this.getPatternData(this.patternCode);
     };
   }
 
   /**
    * @method getPatternData
-   * @description get latest pattern status document from database
-   * @param pattern EMS pattern code (9999-99X)
+   * @desc get latest pattern status document from database
+   * @param {string} pattern EMS pattern code (9999-99X)
    */
-  getPatternData(pattern: string){
-    // get all statuses from the external REST API
+  public getPatternData(pattern: string){
+    // use data service to get pattern data from the database, via external REST API
     this.ds.getAPattern(pattern).subscribe((data => {
       // hold data from database
       this.patternData = data;
       this.postalAccountingNotes = this.patternData.postalAccountingNotes;
       this.status = this.patternData.paperworkStatus;
+      // clear loading indicator
       this.isDataLoaded = true;
-      console.log("pattern data: " + JSON.stringify(this.patternData));
+      // check if there is an existing issue and set status
+      if (this.status == "Issue"){
+        this.isAccountingIssueChecked = true;
+      }
+      else{
+        this.isAccountingIssueChecked = false;
+      }
     }))
   }
 
   /**
    * @method uploadPalletTags
-   * @description invoke the ng-file-uploader - upload process
+   * @desc invoke the ng-file-uploader - upload process
    */
-  uploadPalletTags(){
+  public uploadPalletTags(){
     this.currentPalletTagPattern = this.patternCode;
     this.uploaderPalletTags.uploadAll();
   }
 
    /**
    * @method uploadPalletWorksheet
-   * @description invoke the ng-file-uploader - upload process
+   * @desc invoke the ng-file-uploader - upload process
    */
-  uploadPalletWorksheet(){
+  public uploadPalletWorksheet(){
     this.currentWorksheetPattern = this.patternCode;
     this.uploaderPalletWorksheets.uploadAll();
   }
 
   /**
    * @method getPalletTagProgress
-   * @description get the progress (%) for the current file being uploaded (tracked in array)
+   * @desc get the progress (%) for the current file being uploaded (tracked in array)
    */
-  getPalletTagProgress() {
+  public getPalletTagProgress() {
     var progress: number = 0;
     progress = this.palletTagUploadProgress;
     return progress;
@@ -228,9 +249,9 @@ export class PostalaccountingDetailsComponent implements OnInit, OnDestroy {
 
   /**
    * @method getPalletWorksheetProgress
-   * @description get the progress (%) for the current file being uploaded (tracked in array)
+   * @desc get the progress (%) for the current file being uploaded (tracked in array)
    */
-  getPalletWorksheetProgress() {
+  public getPalletWorksheetProgress() {
     var progress: number = 0;
     progress = this.palletWorksheetUploadProgress;
     return progress;
@@ -238,10 +259,10 @@ export class PostalaccountingDetailsComponent implements OnInit, OnDestroy {
 
   /**
    * @method enablePalletTagsUpload
-   * @description determine if the current upload button is to be enabled to
+   * @desc determine if the current upload button is to be enabled to
    * allow upload - an input file must be selected
    */
-  enablePalletTagsUpload(pattern: string){
+  public enablePalletTagsUpload(){
     if (this.uploaderPalletTags.getNotUploadedItems().length > 0){
       return false;
     }
@@ -252,10 +273,10 @@ export class PostalaccountingDetailsComponent implements OnInit, OnDestroy {
 
   /**
    * @method enablePalletWorksheetUpload
-   * @description determine if the current upload button is to be enabled to
+   * @desc determine if the current upload button is to be enabled to
    * allow upload - an input file must be selected
    */
-  enablePalletWorksheetUpload(){
+  public enablePalletWorksheetUpload(){
     if (this.uploaderPalletWorksheets.getNotUploadedItems().length > 0){
       return false;
     }
@@ -266,16 +287,16 @@ export class PostalaccountingDetailsComponent implements OnInit, OnDestroy {
 
   /**
    * @method checkReplacementCount
-   * @description check for existing file and return the replacement count
-   * @param fileType the given file type to check (Pallet/Worksheet)
+   * @desc check for existing file and return the replacement count
+   * @param {string} fileType the given file type to check (Pallet/Worksheet)
    */
-  checkReplacementCount(fileType: string) {
+  public checkReplacementCount(fileType: string) {
     if (fileType == "Pallet Tags") {
       if ((this.patternData.currentPalletTagFile != "") && (this.patternData.currentPalletTagFile != " ")) {
         // log the event
         this.toastr.warning('You are about to replace File: ' + this.patternData.currentPalletTagFile + '! ', 'bl-status: FileUploader');
         // return the updated replacement count
-        console.log("new count: " + parseInt(this.patternData.palletTagReplacementCount) + 1);
+        //console.log("new count: " + parseInt(this.patternData.palletTagReplacementCount) + 1);
         return parseInt(this.patternData.palletTagReplacementCount) + 1;
       } else {
         return 0;
@@ -294,9 +315,9 @@ export class PostalaccountingDetailsComponent implements OnInit, OnDestroy {
 
   /**
    * @method enablePalletTagsDelete
-   * @description enable Pallet File PDF delete button, if there is a file associated w/ given pattern
+   * @desc enable Pallet File PDF delete button, if there is a file associated w/ given pattern
    */
-  enablePalletTagsDelete(){
+  public enablePalletTagsDelete(){
     if ((this.patternData.currentPalletTagFile != "") &&
     (this.patternData.currentPalletTagFile != " ")){
       return false;
@@ -308,9 +329,9 @@ export class PostalaccountingDetailsComponent implements OnInit, OnDestroy {
 
   /**
    * @method enablePalletWorksheetDelete
-   * @description enable Worksheet File PDF delete button, if there is a file associated w/ given pattern
+   * @desc enable Worksheet File PDF delete button, if there is a file associated w/ given pattern
    */
-  enablePalletWorksheetDelete(){
+  public enablePalletWorksheetDelete(){
     if ((this.patternData.currentPalletWorksheetFile != "") &&
     (this.patternData.currentPalletWorksheetFile != " ")){
       return false;
@@ -322,13 +343,13 @@ export class PostalaccountingDetailsComponent implements OnInit, OnDestroy {
 
   /**
    * @method deletePalletPDF
-   * @description delete Pallet Tag PDF file associated w/ given pattern
+   * @desc delete Pallet Tag PDF file associated w/ given pattern
    */
-  deletePalletPDF() {
-    console.log("Delete Pallet PDF!");
+  public deletePalletPDF() {
+    //console.log("Delete Pallet PDF!");
     var response = this.ds.deletePalletPDF(this.patternCode, this.patternData.currentPalletTagFile)
       .subscribe((data => {
-        console.log("Delete response: " + response);
+        //console.log("Delete response: " + response);
         this.getPatternData(this.patternCode);
         // log the event
         this.logger.addToLog("INFO", "Pallet PDF File Deleted - File: " +
@@ -345,13 +366,13 @@ export class PostalaccountingDetailsComponent implements OnInit, OnDestroy {
 
   /**
    * @method deleteWorkSheetPDF
-   * @description delete Worksheet PDF file associated w/ given pattern
+   * @desc delete Worksheet PDF file associated w/ given pattern
    */
-  deleteWorkSheetPDF(){
-    console.log("Delete Worksheet PDF!");
+  public deleteWorkSheetPDF(){
+    //console.log("Delete Worksheet PDF!");
     var response = this.ds.deleteWorksheetPDF(this.patternCode, this.patternData.currentPalletWorksheetFile)
       .subscribe((data => {
-        console.log("Delete response: " + response);
+        //console.log("Delete response: " + response);
         this.getPatternData(this.patternCode);
         // log the event
         this.logger.addToLog("INFO", "Worksheet PDF File Deleted - File: " +
@@ -369,23 +390,41 @@ export class PostalaccountingDetailsComponent implements OnInit, OnDestroy {
   /**
    * @method editAccountingNotes
    * @description activate the Modal window for editing/updating Postal Accounting notes
-   * @param template a reference to the HTML template content for the Modal window
+   * @param {TemplateRef} template a reference to the HTML template content for the Modal window
    */
   public editAccountingNotes(template: TemplateRef<any>) {
     this.modalRef = this.modalService.show(template);
   }
 
   /**
-   *
+   * @method saveAccountingNotes
+   * @desc save Postal Accounting Notes/Issues to the database
    */
   public saveAccountingNotes(){
-    console.log("notes: " + this.postalAccountingNotes);
-    var data = {
-      "postalAccountingNotes" : this.postalAccountingNotes
+    // set Note and Status update data
+    var data = {};
+    if (this.isAccountingIssueChecked) {
+      data = {
+        "postalAccountingNotes": this.postalAccountingNotes,
+        "paperworkStatus": "Issue"
+      };
+    } else if ((this.patternData.currentPalletTagFile != "") &&
+      (this.patternData.currentPalletTagFile != " ") &&
+      (this.patternData.currentPalletWorksheetFile != "") &&
+      (this.patternData.currentPalletWorksheetFile != " ")) {
+      data = {
+        "postalAccountingNotes": this.postalAccountingNotes,
+        "paperworkStatus": "Complete"
+      };
+    } else {
+      data = {
+        "postalAccountingNotes": this.postalAccountingNotes,
+        "paperworkStatus": "In Process"
+      };
     }
     var response = this.ds.updateStatusByPattern(this.patternData.pattern, data)
     .subscribe((data => {
-      console.log("Note response: " + response);
+      //console.log("Note response: " + response);
       this.getPatternData(this.patternCode);
       // log the event
       this.logger.addToLog("INFO", "Postal Accouting Notes Updated: " +
@@ -396,38 +435,55 @@ export class PostalaccountingDetailsComponent implements OnInit, OnDestroy {
             this.toastr.error('Logging Error!', 'bl-status: Logging Service');
           }
         }));
+
+      // close the Modal
       this.modalRef.hide()
-      this.toastr.success('Postal Accouting Notes Updated!', 'bl-status: Data Service');
+
+      // refresh the data
       this.getPatternData(this.patternCode);
+
+      // done
+      this.toastr.success('Postal Accouting Notes Updated!', 'bl-status: Data Service');
     }))
   }
 
   /**
-   *
+   * @method clearPostalAccoutingNotes
+   * @desc clear Postal Accouting Notes/Issues
    */
-  clearPostalAccoutingNotes(){
+  public clearPostalAccoutingNotes(){
     this.postalAccountingNotes = "";
+    this.isAccountingIssueChecked = false;
   }
 
   /**
-   *
+   * @method checkAccountingIssue
+   * @desc check/uncheck Issue flag checkbox
    */
-  refreshPatternData(){
+  public checkAccountingIssue(){
+    this.isAccountingIssueChecked = !this.isAccountingIssueChecked;
+  }
+
+  /**
+   * @method refreshPatternData
+   * @desc get latest pattern data from the database
+   */
+  public refreshPatternData(){
     this.getPatternData(this.patternCode);
   }
 
   /**
-   *
-   * @param status
+   * @method checkBadgeStatus
+   * @desc display/hide status badges based on given pattern's status
+   * @param {string} status the given pattern's status
    */
-  checkBadgeStatus(status: string){
+  public checkBadgeStatus(status: string){
     if (this.status == status){
       return true;
     } else {
       return false;
     }
   }
-
 
   /**
    * @method ngOnDestroy
