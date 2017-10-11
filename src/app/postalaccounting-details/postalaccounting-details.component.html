@@ -161,13 +161,14 @@
     </button>
   </div>
   <div class="modal-body">
-      <div style="color: red;">
+      <div style="color: #b94a48;">
       <label class="checkbox-inline">
-          <input type="checkbox" [checked]="isAccountingIssueChecked" (change)="checkAccountingIssue($event)"><b>THERE IS AN ISSUE!</b>
+          <input type="checkbox" [checked]="isAccountingIssueChecked" (change)="checkAccountingIssue($event)">There is an issue!
       </label>
+      <span *ngIf="isAccountingIssueChecked" class="badge badge-error">Issue!</span>
     </div>
     <small style="color: #3577ba;">Add/Edit/Update Note(s):</small><br>
-    <textarea ref-textarea [(ngModel)]="postalAccountingNotes" rows="4" cols="87"></textarea>
+    <textarea ref-textarea [(ngModel)]="postalAccountingNotes" rows="4" cols="80"></textarea>
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-danger btn-s" style="margin-top: 0px; margin-bottom: 0px;"(click)="clearPostalAccoutingNotes()">

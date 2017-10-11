@@ -25,50 +25,105 @@ export class HomeComponent implements OnInit {
 
   // misc variables
   public isDataLoaded: boolean = false;
+  public isLineDataloaded: boolean = false;
+  public isBarDataloaded: boolean = false;
+  public isPieDataloaded: boolean = false;
   public logoImagePath: string = "../assets/EMS_Envelope_T.png";
   public filterText: string = null;
   public lastRefreshDate: Date = moment();
-  public pieceTypes:Array<string> = ['Letter', 'Flat'];
-  public statuses:Array<string> = ['New', 'In Process', 'Issue', 'Replacement', 'Complete'];
+  public pieceTypes: Array<string> = ['Letter', 'Flat'];
+  public statuses: Array<string> = ['New', 'In Process', 'Issue', 'Replacement', 'Complete'];
   public selectedFilterPieceType: string = null;
   public selectedFilterStatus: string = null;
+  public isAccountingIssueChecked: boolean = false;  /** PostalAccouting Issue flag */
 
-  // ChartJS parameters
-  public lineChartLegend: boolean = true;
+  // ChartJS parameters (ng2-charts)
+  /* line chart */
+  public totalChartPieces: number = 0;
+  public lineChartLegend: boolean = false;
   public lineChartType: string = 'line';
   public lineChartData: Array<any> = [
     { data: [0, 0, 0, 0, 0, 0, 0], label: 'Pieces' },
   ];
   public lineChartLabels: Array<any> = ['Today', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'];
   public lineChartOptions: any = {
+    scaleShowVerticalLines: false,
     responsive: true
   };
-  public lineChartColors: Array<any> = [
-    { // grey
-      backgroundColor: 'rgba(148,159,177,0.2)',
-      borderColor: 'rgba(148,159,177,1)',
-      pointBackgroundColor: 'rgba(148,159,177,1)',
-      pointBorderColor: '#fff',
-      pointHoverBackgroundColor: '#fff',
-      pointHoverBorderColor: 'rgba(148,159,177,0.8)'
-    },
-    { // dark grey
-      backgroundColor: 'rgba(77,83,96,0.2)',
-      borderColor: 'rgba(77,83,96,1)',
-      pointBackgroundColor: 'rgba(77,83,96,1)',
-      pointBorderColor: '#fff',
-      pointHoverBackgroundColor: '#fff',
-      pointHoverBorderColor: 'rgba(77,83,96,1)'
-    },
-    { // grey
-      backgroundColor: 'rgba(148,159,177,0.2)',
-      borderColor: 'rgba(148,159,177,1)',
-      pointBackgroundColor: 'rgba(148,159,177,1)',
-      pointBorderColor: '#fff',
-      pointHoverBackgroundColor: '#fff',
-      pointHoverBorderColor: 'rgba(148,159,177,0.8)'
-    }
+  public lineChartColors: any[] = [
+    {
+      backgroundColor: ["#949fb1"]
+    }];
+
+  /* bar chart */
+  public totalChartPatterns: number = 0;
+  public barChartLabels: string[] = ['New', 'In Process', 'Issue', 'Complete'];
+  public barChartType: string = 'bar';
+  public barChartLegend: boolean = false;
+  public barChartData: Array<any> = [
+    { data: [1, 2, 3, 4],  label: 'Patterns' },
   ];
+  public barChartColors: any[] = [{backgroundColor: ["#c1c1c1", "#337ab7", "#d9534f", "#7bc47b"]}];
+  public barChartOptions: any = {
+    scaleShowVerticalLines: false,
+    responsive: true,
+    scaleShowValues: true,
+    scaleValuePaddingX: 5,
+    scaleValuePaddingY: 5,
+    animation: {
+      onComplete: function () {
+        var chartInstance = this.chart, ctx = chartInstance.ctx;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        this.data.datasets.forEach(function (dataset, i) {
+          var meta = chartInstance.controller.getDatasetMeta(i);
+          meta.data.forEach(function (bar, index) {
+            var data = dataset.data[index];
+            ctx.fillText(data, bar._model.x, bar._model.y - 0);
+          });
+        });
+      }
+    },
+    scales: {
+      yAxes: [
+        {
+          minimum: 0,
+          display: false,
+          ticks: {
+            beginAtZero: false,
+            stepSize: 0,
+            fontSize: 14
+         }
+        }
+      ],
+      xAxes: [
+        {
+          minimum: 0,
+          display: true,
+          ticks: {
+           beginAtZero: false,
+           stepSize: 0,
+           fontSize: 14
+         }
+      }
+     ]
+    }
+  };
+
+  /* pie chart */
+  public totalPiePatterns: number = 0;
+  public pieChartLabels: string[] = ['New', 'In Process', 'Issue', 'Complete'];
+  public pieChartType: string = 'pie';
+  public pieChartLegend: boolean = true;
+  public pieChartData: Array<any> = [
+    { data: [1, 2, 3, 4],  label: 'Patterns' },
+  ];
+  public pieChartColors: any[] = [{backgroundColor: ["#c1c1c1", "#337ab7", "#d9534f", "#7bc47b"]}];
+  public pieChartOptions: any = {
+    responsive: true,
+    scaleShowValues: true,
+    legend: {position: 'right'}
+  }
 
   // datepicker - date range (ng2-daterangepicker) variables
   @ViewChild(DaterangePickerComponent)
@@ -163,6 +218,8 @@ export class HomeComponent implements OnInit {
    * @description collect data for 7-day Piece Drop Chart
    */
   public buildPieceChart() {
+    this.isLineDataloaded = false;
+
     // work variables
     var days: Array<any> = [];
     var dayLabels: Array<any> = [];
@@ -177,7 +234,9 @@ export class HomeComponent implements OnInit {
     days[4] = moment().add(4, 'days');
     days[5] = moment().add(5, 'days');
     days[6] = moment().add(6, 'days');
+
     // get patterns for each day in range
+    this.totalChartPieces = 0
     for (var i = 0; i < 7; i++) {
       dayPieces = this.temp2.filter(function (d) {
         var momentA = moment(days[i]).format("MM/DD/YY");
@@ -192,14 +251,226 @@ export class HomeComponent implements OnInit {
       // tally piece amounts for each day
       for (var j = 0; j < dayPieces.length; j++) {
         pieces[i] += parseInt(dayPieces[j].total);
+        this.totalChartPieces += parseInt(dayPieces[j].total);
       }
     }
     for (var k = 0; k < days.length; k++) {
       dayLabels[k] = moment(days[k]).format("MM/DD");
     }
+
     // apply data to chart
     this.lineChartData[0] = { data: pieces, label: "Piece Count" };
     this.lineChartLabels = dayLabels;
+    //
+    this.isLineDataloaded = true
+  }
+
+  /**
+   * @method buildBarChart
+   * @desc build dataset for bar chart
+   */
+  public buildBarChart() {
+    this.isBarDataloaded = false;
+
+    // work variables
+    var statusDays: Array<any> = [];
+    var statuses: Array<any> = [];
+    var statusPatterns: Array<any> = [];
+    var statusCounts: Array<any> = [];
+
+    // get date range (7 days).
+    statuses[0] = "New";
+    statuses[1] = "In Process";
+    statuses[2] = "Issue";
+    statuses[3] = "Complete";
+
+    // get date range (7 days).
+    statusDays[0] = moment();
+    statusDays[1] = moment().add(1, 'days');
+    statusDays[2] = moment().add(2, 'days');
+    statusDays[3] = moment().add(3, 'days');
+    statusDays[4] = moment().add(4, 'days');
+    statusDays[5] = moment().add(5, 'days');
+    statusDays[6] = moment().add(6, 'days');
+
+    // initialize status counts
+    statusCounts[0] = 0;
+    statusCounts[1] = 0;
+    statusCounts[2] = 0;
+    statusCounts[3] = 0;
+
+    //console.log("Statuses: " + JSON.stringify(statuses));
+    //console.log("Status Days: " + JSON.stringify(statusDays));
+    //console.log("Status Counts: " + JSON.stringify(statusCounts));
+    //console.log("Barchart Data: " + JSON.stringify(this.barChartData));
+
+    // get patterns for the days in range
+    this.totalChartPatterns = 0;
+    for (var i = 0; i < 7; i++) {
+      statusPatterns = [];
+      statusPatterns = this.temp2.filter(function (d) {
+        var momentA = moment(statusDays[i]).format("MM/DD/YY");
+        var momentB = moment(d.dropDate).format("MM/DD/YY");
+        if (momentA == momentB) {
+          return true;
+        }
+        else {
+          return false;
+        }
+      });
+      console.log("Status Patterns: " + JSON.stringify(statusPatterns));
+      // tally pattern amounts for each day
+      for (var j = 0; j < statusPatterns.length; j++) {
+        console.log("each sampleStatus: " + statusPatterns[j].sampleStatus);
+        console.log("each paperworkStatus: " + statusPatterns[j].paperworkStatus);
+        // New
+        if ((statusPatterns[j].sampleStatus != "Issue") && (statusPatterns[j].paperworkStatus != "Issue")) {
+          if ((statusPatterns[j].sampleStatus == statuses[0]) || (statusPatterns[j].paperworkStatus == statuses[0])) {
+            statusCounts[0]++;
+          }
+        }
+        // In Process
+        if ((statusPatterns[j].sampleStatus != "Issue") && (statusPatterns[j].paperworkStatus != "Issue")) {
+          if ((statusPatterns[j].sampleStatus == statuses[1]) || (statusPatterns[j].paperworkStatus == statuses[1])) {
+            statusCounts[1]++;
+          }
+        }
+        // Issue
+        if((statusPatterns[j].sampleStatus == statuses[2]) || (statusPatterns[j].paperworkStatus == statuses[2])) {
+          statusCounts[2]++;
+        }
+        // Complete
+        if((statusPatterns[j].sampleStatus == statuses[3]) && (statusPatterns[j].paperworkStatus == statuses[3])) {
+          statusCounts[3]++;
+        }
+      }
+
+    }
+
+    //statusCounts[0] = 5;
+    //statusCounts[1] = 9;
+    //statusCounts[2] = 21;
+    //statusCounts[3] = 18;
+
+    // load status counts
+    this.barChartData[0].data[0] = statusCounts[0];
+    this.barChartData[0].data[1] = statusCounts[1];
+    this.barChartData[0].data[2] = statusCounts[2];
+    this.barChartData[0].data[3] = statusCounts[3];
+
+    // apply data to chart
+    var sum = 0;
+    for (var k = 0; k < statusCounts.length; k++) {
+      sum += statusCounts[k];
+    }
+    this.totalChartPatterns = sum;
+
+    //console.log("status length: " + statusPatterns.length);
+    //console.log("Status Counts: " + JSON.stringify(statusCounts));
+    //console.log("patterns-length: " + this.totalChartPatterns);
+    //console.log("bar-data: " + JSON.stringify(this.barChartData));
+
+    // refresh/redraw chart
+    this.barChartData = this.barChartData.slice();
+    this.isBarDataloaded = true;
+  }
+
+  /**
+   *
+   */
+  public buildPieChart() {
+    this.isPieDataloaded = false;
+
+    // work variables
+    var statusDays: Array<any> = [];
+    var statuses: Array<any> = [];
+    var statusPatterns: Array<any> = [];
+    var tallyPatterns: Array<any> = [];
+    var statusCounts: Array<any> = [];
+
+    // get date range (7 days).
+    statuses[0] = "New";
+    statuses[1] = "In Process";
+    statuses[2] = "Issue";
+    statuses[3] = "Complete";
+
+    // get date range (7 days).
+    statusDays[0] = moment();
+    statusDays[1] = moment().add(1, 'days');
+    statusDays[2] = moment().add(2, 'days');
+    statusDays[3] = moment().add(3, 'days');
+    statusDays[4] = moment().add(4, 'days');
+    statusDays[5] = moment().add(5, 'days');
+    statusDays[6] = moment().add(6, 'days');
+
+    // initialize status counts
+    statusCounts[0] = 0;
+    statusCounts[1] = 0;
+    statusCounts[2] = 0;
+    statusCounts[3] = 0;
+
+    // get patterns for the days in range
+    this.totalChartPatterns = 0;
+    tallyPatterns = []
+    for (var i = 0; i < 7; i++) {
+      statusPatterns = [];
+      statusPatterns = this.temp2.filter(function (d) {
+        var momentA = moment(statusDays[i]).format("MM/DD/YY");
+        var momentB = moment(d.dropDate).format("MM/DD/YY");
+        if (momentA == momentB) {
+          tallyPatterns.push(d.pattern);
+          return true;
+        }
+        else {
+          return false;
+        }
+      });
+      console.log("Status Patterns: " + JSON.stringify(statusPatterns));
+      // tally pattern amounts for each day
+      for (var j = 0; j < statusPatterns.length; j++) {
+        console.log("each sampleStatus: " + statusPatterns[j].sampleStatus);
+        console.log("each paperworkStatus: " + statusPatterns[j].paperworkStatus);
+        // New
+        if ((statusPatterns[j].sampleStatus != "Issue") && (statusPatterns[j].paperworkStatus != "Issue")) {
+          if ((statusPatterns[j].sampleStatus == statuses[0]) && (statusPatterns[j].paperworkStatus == statuses[0])) {
+            statusCounts[0]++;
+          } else{
+            statusCounts[0]++;
+          }
+        }
+        // In Process
+        if ((statusPatterns[j].sampleStatus != "Issue") && (statusPatterns[j].paperworkStatus != "Issue")) {
+          if ((statusPatterns[j].sampleStatus == statuses[1]) || (statusPatterns[j].paperworkStatus == statuses[1])) {
+            statusCounts[1]++;
+          }
+        }
+        // Issue
+        if((statusPatterns[j].sampleStatus == statuses[2]) || (statusPatterns[j].paperworkStatus == statuses[2])) {
+          statusCounts[2]++;
+        }
+        // Complete
+        if((statusPatterns[j].sampleStatus == statuses[3]) && (statusPatterns[j].paperworkStatus == statuses[3])) {
+          statusCounts[3]++;
+        }
+      }
+    }
+
+    // load status counts
+    this.pieChartData[0].data[0] = statusCounts[0];
+    this.pieChartData[0].data[1] = statusCounts[1];
+    this.pieChartData[0].data[2] = statusCounts[2];
+    this.pieChartData[0].data[3] = statusCounts[3];
+
+    // apply data to chart
+    var sum = 0;
+    for (var k = 0; k < statusCounts.length; k++) {
+      sum += statusCounts[k];
+    }
+    this.totalChartPatterns = tallyPatterns.length
+
+    // refresh/redraw chart
+    this.pieChartData = this.pieChartData.slice();
+    this.isPieDataloaded = true;
   }
 
   /**
@@ -395,6 +666,8 @@ export class HomeComponent implements OnInit {
 
       // build chart data
       this.buildPieceChart();
+      //this.buildBarChart();
+      this.buildPieChart();
     }));
   }
 

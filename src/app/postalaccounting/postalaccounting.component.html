@@ -22,25 +22,21 @@
       <div class="col-xs-* col-sm-12 col-md-* col-lg-7">
         <!-- datepicker -->
         <div style="padding:0px;margin-top:7px;width: 50%;float: left;">
-          <span>Drop Dates: </span>
+          <span>Drop Date Range: </span>
           <input type="text" name="daterangeInput" daterangepicker [options]="options" (selected)="selectedDate($event, daterange)"
             class="input" style="padding:7px;" />
         </div>
-        <!-- checkboxes -->
-        <span style='padding:8px;margin:5px; float: right;'>
-    <div class="form-check form-check-inline">
-        <span>Show Only: </span>
-        <label class="checkbox-inline">
-        <input type="checkbox" [checked]="isLetterFilterChecked" (change)="checkLettersFilter($event)">Letters
-      </label>
-        <label class="checkbox-inline">
-        <input type="checkbox" [checked]="isFlatFilterChecked" (change)="checkFlatsFilter($event)">Flats
-      </label>
-        <label class="checkbox-inline">
-        <input type="checkbox" [checked]="isCompleteFilterChecked" (change)="checkCompleteFilter($event)">Complete
-      </label>
-      </div>
-      </span>
+        <!-- select filters -->
+        <span style='padding:8px;margin:0px;width:25%;float:left;'>
+          <ng-select [allowClear]="true" [items]="pieceTypes" (selected)="pieceTypeFilterSelected($event)" (removed)="pieceTypeFilterRemoved($event)"
+            placeholder="Piece Type Filter">
+          </ng-select>
+        </span>
+        <span style='padding:8px;margin:0px;width:25%;float:right;'>
+          <ng-select [allowClear]="true" [items]="statuses" (selected)="statusFilterSelected($event)" (removed)="statusFilterRemoved($event)"
+            placeholder="Status Filter">
+          </ng-select>
+        </span>
     </div>
   </div>
   <div style="text-align: left;color: #3577ba;"><small><b>data last refreshed @:</b> {{this.lastRefreshDate}}</small></div>
