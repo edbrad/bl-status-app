@@ -1,0 +1,36 @@
+/* NGX-DATATABLE */
+.sample-new{
+  background-color: #c1c1c1;
+}
+.sample-replacement{
+  background-color: #f0ad4e;
+}
+.sample-in-progress{
+  background-color: #3577ba;
+  color: white;
+}
+.sample-issue{
+  background-color: #FB6F6F;
+  color: white;
+}
+.sample-complete{
+  background-color: #7BC47B;
+  color: white;
+}
+/**/
+.paperwork-new{
+  background-color: #c1c1c1;
+}
+.paperwork-replacement{
+  background-color: #f0ad4e;
+}
+.paperwork-in-progress{
+  background-color: #3577ba;
+}
+.paperwork-issue{
+  background-color: #d9534f;
+}
+.paperwork-complete{
+  background-color: #7BC47B;
+}
+

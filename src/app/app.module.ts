@@ -36,6 +36,7 @@ import { AdminComponent } from './admin/admin.component';
 
 // custom pipes/filters
 import { AddCommasPipe } from './add-commas.pipe';
+import { SampleroomDetailsComponent } from './sampleroom-details/sampleroom-details.component';
 
 @NgModule({
   declarations: [
@@ -50,7 +51,8 @@ import { AddCommasPipe } from './add-commas.pipe';
     AdminComponent,
     AddCommasPipe,
     FileSelectDirective,
-    PostalaccountingDetailsComponent
+    PostalaccountingDetailsComponent,
+    SampleroomDetailsComponent
   ],
   imports: [
     BrowserModule,

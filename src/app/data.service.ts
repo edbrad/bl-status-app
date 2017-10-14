@@ -1,7 +1,7 @@
 declare var moment: any;  /** prevent TypeScript typings error when using non-TypeSCript Lib (momentJS) */
 // Angular 2/4 native libraries
 import { Injectable } from '@angular/core';
-import { Http, Response, Headers, RequestOptions } from '@angular/http';
+import { Http, Response, Headers, RequestOptions, ResponseContentType } from '@angular/http';
 import 'rxjs/Rx';
 
 // custom services
@@ -26,7 +26,9 @@ export class DataService {
    * @desc connect to bl-status API test endpoint
    */
   public apiTest() {
+    // set API url
     const url = this.urlRoot + '/';
+
     // create an Observable for the HTTP/REST API call and transform (map) the response to a JSON array
     return this.http.get(url)
       .map((response: Response) => response);
@@ -37,7 +39,9 @@ export class DataService {
    * @desc get all the status records/documents from the bl-status API
    */
   public getAllStatuses() {
+    // set API url
     const url = this.urlRoot + '/all-statuses/';
+
     // create an Observable for the HTTP/REST API call and transform (map) the response to a JSON array
     return this.http.get(url)
       .map((response: Response) => response.json());
@@ -49,7 +53,9 @@ export class DataService {
    * @param {string} pattern the given pattern
    */
   public getAPattern(pattern: string) {
+    // set API url
     const url = this.urlRoot + '/find-one-by-pattern/?pattern=' + pattern;
+
     // create an Observable for the HTTP/REST API call and transform (map) the response to a JSON array
     return this.http.get(url)
       .map((response: Response) => response.json());
@@ -62,15 +68,21 @@ export class DataService {
    * @param {string} file the given file name for the given pattern
    */
   public deletePalletPDF(pattern: string, fileName: string){
-    //console.log("file-delete DS!");
+    // set http headers
     var headers = new Headers({ 'Content-Type': 'application/json' });
     var options = new RequestOptions({ headers: headers });
+
+    // set API url
     const url = this.urlRoot + '/file-delete/';
+
+    // set http POST body data
     var data = {
       pattern: pattern,
       fileName: fileName,
       fileType: "Pallet Tags"
     };
+
+    // create an Observable for the HTTP/REST API call and transform (map) the response to a JSON array
     return this.http.post(url, data, options)
       .map((response: Response) => response.json());
   }
@@ -82,14 +94,20 @@ export class DataService {
    * @param {object} update given data to be updated
    */
   public updateStatusByPattern(pattern: string, update: object){
-    //console.log("update DS!");
+    // set http headers
     var headers = new Headers({ 'Content-Type': 'application/json' });
     var options = new RequestOptions({ headers: headers });
+
+    // set API url
     const url = this.urlRoot + '/update-many-by-pattern/';
+
+    // set http POST body data
     var data = {
       update_pattern: pattern,
       update_data: update
     };
+
+    // create an Observable for the HTTP/REST API call and transform (map) the response to a JSON array
     return this.http.put(url, data, options)
       .map((response: Response) => response.json());
   }
@@ -101,17 +119,53 @@ export class DataService {
    * @param {string} file the given file name for the given pattern
    */
   public deleteWorksheetPDF(pattern: string, fileName: string){
-    //console.log("file-delete DS!");
+    // set http headers
     var headers = new Headers({ 'Content-Type': 'application/json' });
     var options = new RequestOptions({ headers: headers });
+
+    // set API url
     const url = this.urlRoot + '/file-delete/';
+
+    // set http POST body data
     var data = {
       pattern: pattern,
       fileName: fileName,
       fileType: "Pallet Worksheet"
     };
+
+    // create an Observable for the HTTP/REST API call and transform (map) the response to a JSON array
     return this.http.post(url, data, options)
       .map((response: Response) => response.json());
+  }
+
+  /**
+   * @method downloadFile
+   * @desc download file (PDF) via the API
+   * @param {string} filename the name of the file to be downloaded
+   * @param {string} pattern the given pattern associated with the file
+   */
+  public downloadFile(filename: string, pattern: string, fileType: string){
+    // set http headers
+    let headers = new Headers({
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    });
+    let options = new RequestOptions({ headers: headers });
+    options.responseType = ResponseContentType.Blob;
+
+    // set API url
+    const url = this.urlRoot + '/file-download/';
+
+    // set http POST body data
+    var data = {
+      file: filename,
+      pattern: pattern,
+      fileType: fileType
+    };
+
+    // create an Observable for the HTTP/REST API call and transform (map) the response (Binary)
+    return this.http.post(url, data, options)
+      .map((response: Response) => response);
   }
 
   /**
@@ -120,7 +174,9 @@ export class DataService {
    * @param {string} jobnum the given EMS Job number
    */
   public getAJob(jobnum: string) {
+    // set API url
     const url = this.urlJTRoot + '/api/jobnum-search?jobnum=' + jobnum;
+
     // create an Observable for the HTTP/REST API call and transform (map) the response to a JSON array
     return this.http.get(url)
       .map((response: Response) => response.json());
@@ -131,7 +187,9 @@ export class DataService {
    * @description get all the clients from the pyACCESS (Job Ticket) API
    */
   public getClients() {
+    // set API url
     const url = this.urlJTRoot + '/api/companies';
+
     // create an Observable for the HTTP/REST API call and transform (map) the response to a JSON array
     return this.http.get(url)
       .map((response: Response) => response.json());
@@ -143,7 +201,9 @@ export class DataService {
    * @param {string} jobnum provided Job Number
    */
   public getJobDetails(jobnum: string) {
+    // set API url
     const url = this.urlJTRoot + '/api/jobdetails?jobnum=' + jobnum;
+
     // create an Observable for the HTTP/REST API call and transform (map) the response to a JSON array
     return this.http.get(url)
       .map((response: Response) => response.json());

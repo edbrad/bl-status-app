@@ -1,6 +1,189 @@
 <div class="container">
+  <ngx-loading [show]="!isDataLoaded" [config]="{ backdropBorderRadius: '14px' }"></ngx-loading>
   <div class="starter-template">
-    <h1>Drop Shipping</h1>
-    <p class="lead">bl-status Drop Shipping Page</p>
+    <h3 style="margin-top: 3px;">
+      <b>bl-status:</b> Drop Shipping - Pallet Paperwork</h3>
   </div>
-</div>
+  <div>
+    <!-- filter -->
+    <div class="row">
+      <div class="col-xs-* col-sm-6 col-md-* col-lg-3">
+        <input type='text' style='padding:8px;margin:5px auto;width:100%;' placeholder='Type to filter the pattern column...' (keyup)='updatePatternFilter($event)'
+          [(ngModel)]='this.filterText' />
+      </div>
+      <div class="col-xs-* col-sm-6 col-md-* col-lg-2" style="margin-top:7px;">
+        <!-- refresh -->
+        <button (click)="refreshStatusData()" class="btn btn-primary">
+          <span class="glyphicon glyphicon-refresh"></span> Refresh
+        </button>
+      </div>
+      <!-- additional filters -->
+      <div class="col-xs-* col-sm-12 col-md-* col-lg-7">
+        <!-- datepicker -->
+        <div style="padding:0px;margin-top:7px;width: 50%;float: left;">
+          <span>Drop Date Range: </span>
+          <input type="text" name="daterangeInput" daterangepicker [options]="options" (selected)="selectedDate($event, daterange)"
+            class="input" style="padding:7px;" />
+        </div>
+        <!-- select filters -->
+        <span style='padding:8px;margin:0px;width:25%;float:left;'>
+          <ng-select [allowClear]="true" [items]="pieceTypes" (selected)="pieceTypeFilterSelected($event)" (removed)="pieceTypeFilterRemoved($event)"
+            placeholder="Piece Type Filter">
+          </ng-select>
+        </span>
+        <span style='padding:8px;margin:0px;width:25%;float:right;'>
+          <ng-select [allowClear]="true" [items]="statuses" (selected)="statusFilterSelected($event)" (removed)="statusFilterRemoved($event)"
+            placeholder="Status Filter">
+          </ng-select>
+        </span>
+      </div>
+    </div>
+    <div style="text-align: left;color: #3577ba;">
+      <small>
+        <b>data last refreshed @:</b> {{this.lastRefreshDate}}</small>
+    </div>
+    <div>
+    </div>
+    <!-- data table (ngx-datatable) -->
+    <div style="margin-top: 15px">
+      <ngx-datatable (page)="onPage($event)" class="material expandable" #dropShippingTable [rows]="rows" [columns]="columns" [columnMode]="'force'"
+        [sortType]="'multi'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [limit]="20" [rowClass]="getRowClass">
+        <!-- Row Detail Template (expandable) -->
+        <ngx-datatable-row-detail [rowHeight]="'auto'" #myDetailRow (toggle)="onDetailToggle($event)">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-row-detail-template>
+            <div style="padding-left:35px;">
+              <div>
+                <strong>PATTERN DETAILS:</strong>
+                <span style="color: #3577ba; margin-left: 4px;">
+                  <b>{{row.pattern}}</b>
+                </span>
+              </div>
+              <br>
+              <table class="table table-condensed table-bordered table-responsive">
+                <tr>
+                  <td class="col-md-2 col-sm-1">
+                    <b>Client:</b>
+                  </td>
+                  <td class="col-md-4 col-sm-2">{{row.client}}</td>
+                  <td class="col-md-2 col-sm-1">
+                    <b>Piece Specs:</b>
+                  </td>
+                  <td class="col-md-4 col-sm-2">{{row.Specs}}</td>
+                </tr>
+                <tr>
+                  <td class="col-md-2 col-sm-1">
+                    <b>CAR-RT?:</b>
+                  </td>
+                  <td class="col-md-4 col-sm-2">{{row.hasCRRT}}</td>
+                  <td class="col-md-2 col-sm-1">
+                    <b>Tray/Sack Max:</b>
+                  </td>
+                  <td class="col-md-4 col-sm-2">{{row.trayMax}}</td>
+                </tr>
+                <tr>
+                  <td class="col-md-2 col-sm-1">
+                    <b>Internal Project ID:</b>
+                  </td>
+                  <td class="col-md-4 col-sm-2">{{row.projectID}}</td>
+                  <td class="col-md-2 col-sm-1">
+                    <b>Internal Qual. ID:</b>
+                  </td>
+                  <td class="col-md-4 col-sm-2">{{row.qualID}}</td>
+                </tr>
+                <tr>
+                  <td class="col-md-2 col-sm-1">
+                    <b>Single Piece Count:</b>
+                  </td>
+                  <td class="col-md-4 col-sm-2">{{row.spr}}</td>
+                  <td class="col-md-2 col-sm-1">
+                    <b>Failed Piece Count:</b>
+                  </td>
+                  <td class="col-md-4 col-sm-2">{{row.fail}}</td>
+                </tr>
+                <tr>
+                  <td class="col-md-2 col-sm-1">
+                    <b>Sample Note(s):</b>
+                  </td>
+                  <td class="col-md-4 col-sm-2">{{row.sampleRoomNotes}}</td>
+                  <td class="col-md-2 col-sm-1">
+                    <b>Accounting Note(s):</b>
+                  </td>
+                  <td class="col-md-4 col-sm-2">{{row.postalAccountingNotes}}</td>
+                </tr>
+              </table>
+              <!--<div>
+                <button (click)="printJobTicket(row.pattern)" style="margin-bottom: 10px; margin-left: 0px;" class="btn btn-primary">
+                  <i class="fa fa-print"></i> Print Unofficial Job Ticket</button>
+              </div>-->
+            </div>
+          </ng-template>
+        </ngx-datatable-row-detail>
+        <!-- Column Templates -->
+        <ngx-datatable-column [width]="30" [resizeable]="false" [sortable]="false" [draggable]="false" [canAutoResize]="false">
+          <ng-template let-row="row" let-expanded="expanded" ngx-datatable-cell-template>
+            <a [routerLink]=[] [class.datatable-icon-right]="!expanded" [class.datatable-icon-down]="expanded" title="Expand/Collapse Row"
+              (click)="toggleExpandRow(row)">
+            </a>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Pattern" [width]="40">
+          <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+            <strong>{{row.pattern}}</strong>
+            <span *ngIf="isComplete(row.sampleStatus, row.paperworkStatus)">
+              <i class="fa fa-check" aria-hidden="true" style="color:green"></i>
+            </span>
+          </ng-template>
+        </ngx-datatable-column>
+        <!--<ngx-datatable-column name="Project" [width]="150">
+          <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+            {{row.project}}
+          </ng-template>
+        </ngx-datatable-column>-->
+        <!--<ngx-datatable-column name="Mail Class">
+          <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+            {{row.mailClass}}
+          </ng-template>
+        </ngx-datatable-column>-->
+        <ngx-datatable-column name="Sample Status" [cellClass]="getSampleCellClass" [width]="40">
+          <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+            {{row.sampleStatus}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Paperwork Status" [cellClass]="getPaperworkCellClass" [width]="40">
+          <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+            {{row.paperworkStatus}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Piece Type" [width]="30">
+          <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+            {{row.type}}
+          </ng-template>
+        </ngx-datatable-column>
+        <!--<ngx-datatable-column name="Piece Count">
+          <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+            {{row.total | addCommas}}
+          </ng-template>
+        </ngx-datatable-column>-->
+        <ngx-datatable-column name="Drop Date" [width]="30">
+          <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+            {{row.dropDate}}
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Pallet Tag Download Link">
+          <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+            <button [disabled]="checkPalletTagDownload(row.currentPalletTagFile)"
+            class="btn btn-primary"
+            (click)="downloadFile(row.currentPalletTagFile, row.pattern, 'Pallet Tags')">Download Pallet Tag(s)
+          </button>
+          </ng-template>
+        </ngx-datatable-column>
+        <ngx-datatable-column name="Pallet Worksheet Download Link">
+          <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+            <button [disabled]="checkPalletWorksheetDownload(row.currentPalletWorksheetFile)"
+            class="btn btn-warning"
+            (click)="downloadFile(row.currentPalletWorksheetFile, row.pattern, 'Pallet Worksheet')">Download Pallet Worksheet</button>
+          </ng-template>
+        </ngx-datatable-column>
+      </ngx-datatable>
+    </div>
+  </div>

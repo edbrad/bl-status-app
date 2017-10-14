@@ -127,7 +127,7 @@ export class PostalaccountingDetailsComponent implements OnInit, OnDestroy {
     // get the given pattern data
     this.getPatternData(this.patternCode);
     // log the event
-    this.logger.addToLog("INFO", "Postal Accounting Component activated.").subscribe((data => {
+    this.logger.addToLog("INFO", "Postal Accounting Pattern Details Component activated.").subscribe((data => {
       const ack = data;
       if (!ack){
         this.toastr.error('Logging Error!', 'bl-status: Logging Service');

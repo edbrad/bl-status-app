@@ -1,6 +1,91 @@
 <div class="container">
-  <div class="starter-template">
-    <h1>Sample Room</h1>
-    <p class="lead">bl-status Sample Room Page</p>
-  </div>
+    <ngx-loading [show]="!isDataLoaded" [config]="{ backdropBorderRadius: '14px' }"></ngx-loading>
+    <div class="starter-template">
+      <h3 style="margin-top: 3px;"><b>bl-status:</b> Sample Room Summary</h3>
+    </div>
+    <div>
+        <!-- filter -->
+        <div class="row">
+          <div class="col-xs-* col-sm-6 col-md-* col-lg-3">
+            <input type='text' style='padding:8px;margin:5px auto;width:100%;' placeholder='Type to filter the pattern column...' (keyup)='updatePatternFilter($event)'
+              [(ngModel)]='this.filterText' />
+          </div>
+          <div class="col-xs-* col-sm-6 col-md-* col-lg-2" style="margin-top:7px;">
+            <!-- refresh -->
+            <button (click)="refreshStatusData()" class="btn btn-primary">
+          <span class="glyphicon glyphicon-refresh"></span> Refresh
+        </button>
+          </div>
+          <!-- additional filters -->
+          <div class="col-xs-* col-sm-12 col-md-* col-lg-7">
+            <!-- datepicker -->
+            <div style="padding:0px;margin-top:7px;width: 50%;float: left;">
+              <span>Drop Date Range: </span>
+              <input type="text" name="daterangeInput" daterangepicker [options]="options" (selected)="selectedDate($event, daterange)"
+                class="input" style="padding:7px;" />
+            </div>
+            <!-- select filters -->
+            <span style='padding:8px;margin:0px;width:25%;float:left;'>
+              <ng-select [allowClear]="true" [items]="pieceTypes" (selected)="pieceTypeFilterSelected($event)" (removed)="pieceTypeFilterRemoved($event)"
+                placeholder="Piece Type Filter">
+              </ng-select>
+            </span>
+            <span style='padding:8px;margin:0px;width:25%;float:right;'>
+              <ng-select [allowClear]="true" [items]="statuses" (selected)="statusFilterSelected($event)" (removed)="statusFilterRemoved($event)"
+                placeholder="Status Filter">
+              </ng-select>
+            </span>
+        </div>
+      </div>
+      <div style="text-align: left;color: #3577ba;"><small><b>data last refreshed @:</b> {{this.lastRefreshDate}}</small></div>
+      <div>
+    </div>
+      <!-- data table (ngx-datatable) -->
+      <div style="margin-top: 15px">
+        <ngx-datatable (page)="onPage($event)" class="material expandable" #sampleRoomTable [rows]="rows" [columns]="columns"
+          [columnMode]="'force'" [sortType]="'multi'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [limit]="20"
+          [rowClass]="getRowClass">
+          <!-- Column Templates -->
+          <ngx-datatable-column name="Pattern">
+            <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+              <a [routerLink]="['/sampleroom-details', row.pattern]"><strong>{{row.pattern}}</strong></a>
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Project" [width]="280">
+            <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+              {{row.project}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Mail Class">
+            <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+              {{row.mailClass}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Sample Status" [cellClass]="getSampleCellClass">
+            <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+              {{row.sampleStatus}}
+            </ng-template>
+          </ngx-datatable-column>
+          <!--<ngx-datatable-column name="Paperwork Status" [cellClass]="getPaperworkCellClass">
+            <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+              {{row.paperworkStatus}}
+            </ng-template>
+          </ngx-datatable-column>-->
+          <ngx-datatable-column name="Piece Type">
+            <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+              {{row.type}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Piece Count">
+            <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+              {{row.total | addCommas}}
+            </ng-template>
+          </ngx-datatable-column>
+          <ngx-datatable-column name="Drop Date">
+            <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+              {{row.dropDate}}
+            </ng-template>
+          </ngx-datatable-column>
+        </ngx-datatable>
+      </div>
 </div>

@@ -299,11 +299,6 @@ export class HomeComponent implements OnInit {
     statusCounts[2] = 0;
     statusCounts[3] = 0;
 
-    //console.log("Statuses: " + JSON.stringify(statuses));
-    //console.log("Status Days: " + JSON.stringify(statusDays));
-    //console.log("Status Counts: " + JSON.stringify(statusCounts));
-    //console.log("Barchart Data: " + JSON.stringify(this.barChartData));
-
     // get patterns for the days in range
     this.totalChartPatterns = 0;
     for (var i = 0; i < 7; i++) {
@@ -318,39 +313,37 @@ export class HomeComponent implements OnInit {
           return false;
         }
       });
-      console.log("Status Patterns: " + JSON.stringify(statusPatterns));
+      //console.log("Status Patterns: " + JSON.stringify(statusPatterns));
       // tally pattern amounts for each day
       for (var j = 0; j < statusPatterns.length; j++) {
-        console.log("each sampleStatus: " + statusPatterns[j].sampleStatus);
-        console.log("each paperworkStatus: " + statusPatterns[j].paperworkStatus);
+        //console.log("each sampleStatus: " + statusPatterns[j].sampleStatus);
+        //console.log("each paperworkStatus: " + statusPatterns[j].paperworkStatus);
+
         // New
         if ((statusPatterns[j].sampleStatus != "Issue") && (statusPatterns[j].paperworkStatus != "Issue")) {
           if ((statusPatterns[j].sampleStatus == statuses[0]) || (statusPatterns[j].paperworkStatus == statuses[0])) {
             statusCounts[0]++;
           }
         }
+
         // In Process
         if ((statusPatterns[j].sampleStatus != "Issue") && (statusPatterns[j].paperworkStatus != "Issue")) {
           if ((statusPatterns[j].sampleStatus == statuses[1]) || (statusPatterns[j].paperworkStatus == statuses[1])) {
             statusCounts[1]++;
           }
         }
+
         // Issue
         if((statusPatterns[j].sampleStatus == statuses[2]) || (statusPatterns[j].paperworkStatus == statuses[2])) {
           statusCounts[2]++;
         }
+
         // Complete
         if((statusPatterns[j].sampleStatus == statuses[3]) && (statusPatterns[j].paperworkStatus == statuses[3])) {
           statusCounts[3]++;
         }
       }
-
     }
-
-    //statusCounts[0] = 5;
-    //statusCounts[1] = 9;
-    //statusCounts[2] = 21;
-    //statusCounts[3] = 18;
 
     // load status counts
     this.barChartData[0].data[0] = statusCounts[0];
@@ -365,18 +358,14 @@ export class HomeComponent implements OnInit {
     }
     this.totalChartPatterns = sum;
 
-    //console.log("status length: " + statusPatterns.length);
-    //console.log("Status Counts: " + JSON.stringify(statusCounts));
-    //console.log("patterns-length: " + this.totalChartPatterns);
-    //console.log("bar-data: " + JSON.stringify(this.barChartData));
-
     // refresh/redraw chart
     this.barChartData = this.barChartData.slice();
     this.isBarDataloaded = true;
   }
 
   /**
-   *
+   * @method buildPieChart
+   * @desc build dataset for pie chart
    */
   public buildPieChart() {
     this.isPieDataloaded = false;
@@ -428,26 +417,28 @@ export class HomeComponent implements OnInit {
       console.log("Status Patterns: " + JSON.stringify(statusPatterns));
       // tally pattern amounts for each day
       for (var j = 0; j < statusPatterns.length; j++) {
-        console.log("each sampleStatus: " + statusPatterns[j].sampleStatus);
-        console.log("each paperworkStatus: " + statusPatterns[j].paperworkStatus);
+        //console.log("each sampleStatus: " + statusPatterns[j].sampleStatus);
+        //console.log("each paperworkStatus: " + statusPatterns[j].paperworkStatus);
+
         // New
         if ((statusPatterns[j].sampleStatus != "Issue") && (statusPatterns[j].paperworkStatus != "Issue")) {
-          if ((statusPatterns[j].sampleStatus == statuses[0]) && (statusPatterns[j].paperworkStatus == statuses[0])) {
-            statusCounts[0]++;
-          } else{
+          if ((statusPatterns[j].sampleStatus == statuses[0]) || (statusPatterns[j].paperworkStatus == statuses[0])) {
             statusCounts[0]++;
           }
         }
+
         // In Process
         if ((statusPatterns[j].sampleStatus != "Issue") && (statusPatterns[j].paperworkStatus != "Issue")) {
           if ((statusPatterns[j].sampleStatus == statuses[1]) || (statusPatterns[j].paperworkStatus == statuses[1])) {
             statusCounts[1]++;
           }
         }
+
         // Issue
         if((statusPatterns[j].sampleStatus == statuses[2]) || (statusPatterns[j].paperworkStatus == statuses[2])) {
           statusCounts[2]++;
         }
+
         // Complete
         if((statusPatterns[j].sampleStatus == statuses[3]) && (statusPatterns[j].paperworkStatus == statuses[3])) {
           statusCounts[3]++;
@@ -456,10 +447,10 @@ export class HomeComponent implements OnInit {
     }
 
     // load status counts
-    this.pieChartData[0].data[0] = statusCounts[0];
-    this.pieChartData[0].data[1] = statusCounts[1];
-    this.pieChartData[0].data[2] = statusCounts[2];
-    this.pieChartData[0].data[3] = statusCounts[3];
+    this.pieChartData[0].data[0] = statusCounts[0]; /** New */
+    this.pieChartData[0].data[1] = statusCounts[1]; /** In Process */
+    this.pieChartData[0].data[2] = statusCounts[2]; /** Issue */
+    this.pieChartData[0].data[3] = statusCounts[3]; /** Complete */
 
     // apply data to chart
     var sum = 0;

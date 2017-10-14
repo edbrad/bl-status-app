@@ -45,12 +45,12 @@
   <!-- data table (ngx-datatable) -->
   <div style="margin-top: 15px">
     <ngx-datatable (page)="onPage($event)" class="material expandable" #postalAccountingTable [rows]="rows" [columns]="columns"
-      [columnMode]="'force'" [sortType]="'multi'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [limit]="10"
+      [columnMode]="'force'" [sortType]="'multi'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [limit]="20"
       [rowClass]="getRowClass">
       <!-- Column Templates -->
       <ngx-datatable-column name="Pattern">
         <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
-          <a [routerLink]="['/postalaccounting-details', row.pattern]"><strong>{{row.pattern}}</strong><span *ngIf="isComplete(row.sampleStatus, row.paperworkStatus)"><i class="fa fa-check" aria-hidden="true" style="color:green"></i></span></a>
+          <a [routerLink]="['/postalaccounting-details', row.pattern]"><strong>{{row.pattern}}</strong></a>
         </ng-template>
       </ngx-datatable-column>
       <ngx-datatable-column name="Project" [width]="280">
@@ -63,11 +63,11 @@
           {{row.mailClass}}
         </ng-template>
       </ngx-datatable-column>
-      <ngx-datatable-column name="Sample Status" [cellClass]="getSampleCellClass">
+      <!--<ngx-datatable-column name="Sample Status" [cellClass]="getSampleCellClass">
         <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
           {{row.sampleStatus}}
         </ng-template>
-      </ngx-datatable-column>
+      </ngx-datatable-column>-->
       <ngx-datatable-column name="Paperwork Status" [cellClass]="getPaperworkCellClass">
         <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
           {{row.paperworkStatus}}

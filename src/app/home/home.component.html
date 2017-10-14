@@ -102,7 +102,7 @@
   <ngx-datatable (page)="onPage($event)" class="material expandable" #homeTable [rows]="rows" [columns]="columns" [columnMode]="'force'"
     [sortType]="'multi'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [limit]="10" [rowClass]="getRowClass">
     <!-- Row Detail Template (expandable) -->
-    <ngx-datatable-row-detail [rowHeight]="275" #myDetailRow (toggle)="onDetailToggle($event)">
+    <ngx-datatable-row-detail [rowHeight]="'auto'" #myDetailRow (toggle)="onDetailToggle($event)">
       <ng-template let-row="row" let-expanded="expanded" ngx-datatable-row-detail-template>
         <div style="padding-left:35px;">
           <div><strong>PATTERN DETAILS:</strong><span style="color: #3577ba; margin-left: 4px;"><b>{{row.pattern}}</b></span></div>
@@ -134,7 +134,7 @@
             </tr>
             <tr>
               <td class="col-md-2 col-sm-1"><b>Sample Note(s):</b></td>
-              <td class="col-md-4 col-sm-2">--</td>
+              <td class="col-md-4 col-sm-2">{{row.sampleRoomNotes}}</td>
               <td class="col-md-2 col-sm-1"><b>Accounting Note(s):</b></td>
               <td class="col-md-4 col-sm-2">{{row.postalAccountingNotes}}</td>
             </tr>
