@@ -14,6 +14,7 @@ import { ChartsModule } from 'ng2-charts';
 import { FileSelectDirective } from 'ng2-file-upload';
 import { LoadingModule, ANIMATION_TYPES } from 'ngx-loading';
 import { SelectModule } from 'ng2-select';
+import { TabsModule } from 'ngx-bootstrap/tabs';
 
 // custom services
 import { AuthenticationService } from './auth/auth.service';
@@ -80,6 +81,7 @@ import { SampleroomDetailsComponent } from './sampleroom-details/sampleroom-deta
       tertiaryColour: '#ffffff'
   }),
     SelectModule,
+    TabsModule.forRoot(),
   ],
   providers: [
     AuthGuard,

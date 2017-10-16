@@ -41,6 +41,7 @@
     <div style="text-align: left;color: #3577ba;">
       <small>
         <b>data last refreshed @:</b> {{this.lastRefreshDate}}</small>
+        <span style="float: right; color: #3577ba; font-weight:normal"><small><label><input type="checkbox" [checked]="isAutoRefreshChecked" (change)="checkAutoRefresh($event)"> Enable Auto Refresh (every 60 seconds)</label></small></span>
     </div>
     <div>
     </div>
@@ -149,7 +150,7 @@
             {{row.sampleStatus}}
           </ng-template>
         </ngx-datatable-column>
-        <ngx-datatable-column name="Paperwork Status" [cellClass]="getPaperworkCellClass" [width]="40">
+        <ngx-datatable-column name="Paperwork Status" [cellClass]="getPaperworkCellClass" [width]="45">
           <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
             {{row.paperworkStatus}}
           </ng-template>
@@ -164,24 +165,35 @@
             {{row.total | addCommas}}
           </ng-template>
         </ngx-datatable-column>-->
-        <ngx-datatable-column name="Drop Date" [width]="30">
+        <ngx-datatable-column name="Drop Date" [width]="25">
           <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
             {{row.dropDate}}
           </ng-template>
         </ngx-datatable-column>
-        <ngx-datatable-column name="Pallet Tag Download Link">
+        <ngx-datatable-column name="Pallet Tag Download">
           <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
             <button [disabled]="checkPalletTagDownload(row.currentPalletTagFile)"
-            class="btn btn-primary"
-            (click)="downloadFile(row.currentPalletTagFile, row.pattern, 'Pallet Tags')">Download Pallet Tag(s)
+            class="btn btn-primary btn-sm"
+            popover="I will hide on blur"
+            triggers="mouseenter:mouseleave"
+            (click)="downloadFile(row.currentPalletTagFile, row.pattern, 'Pallet Tags')">
+            <span class="glyphicon glyphicon-download"></span>
+             Get Pallet Tag(s)
           </button>
+          <span class="badge badge-secondary">D{{row.palletTagFileDownloadCount}}</span>
+           <!--<small style="color: #3577ba;"> {{row.palletTagFileDownloadCount}}</small>-->
           </ng-template>
         </ngx-datatable-column>
-        <ngx-datatable-column name="Pallet Worksheet Download Link">
+        <ngx-datatable-column name="Pallet Worksheet Download">
           <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
             <button [disabled]="checkPalletWorksheetDownload(row.currentPalletWorksheetFile)"
-            class="btn btn-warning"
-            (click)="downloadFile(row.currentPalletWorksheetFile, row.pattern, 'Pallet Worksheet')">Download Pallet Worksheet</button>
+            class="btn btn-warning btn-sm"
+            (click)="downloadFile(row.currentPalletWorksheetFile, row.pattern, 'Pallet Worksheet')">
+            <span class="glyphicon glyphicon-download"></span>
+             Get Pallet Worksheet
+            </button>
+            <span class="badge badge-secondary">D{{row.palletWorksheetFileDownloadCount}}</span>
+            <!--<small style="color: #3577ba;"> {{row.palletWorksheetFileDownloadCount}}</small>-->
           </ng-template>
         </ngx-datatable-column>
       </ngx-datatable>

@@ -1,8 +1,9 @@
 declare var pdfMake: any; /** prevent TypeScript typings error when using non-TypeSCript Lib (pdfmake) */
 declare var moment: any;  /** prevent TypeScript typings error when using non-TypeSCript Lib (momentJS) */
 // Angular 2/4 native libraries
-import { Component, OnInit, ViewEncapsulation, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewEncapsulation, ViewChild } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
+import { Subscription } from "rxjs/Subscription";
 import 'rxjs/add/operator/map'
 
 // 3rd-party/open-source components
@@ -36,6 +37,10 @@ export class HomeComponent implements OnInit {
   public selectedFilterPieceType: string = null;
   public selectedFilterStatus: string = null;
   public isAccountingIssueChecked: boolean = false;  /** PostalAccouting Issue flag */
+  public isAutoRefreshChecked: boolean = false;
+
+  // Observable Subscriptions Array
+  private subscriptions: Subscription[] = [];
 
   // ChartJS parameters (ng2-charts)
   /* line chart */
@@ -211,7 +216,27 @@ export class HomeComponent implements OnInit {
         this.toastr.error('Logging Error!', 'bl-status: Logging Service');
       }
     }));
+
+    // add auto-refresh initialization
+    // TODO: use the suscriptions array for other Observables
+    this.subscriptions.push(
+      Observable.interval(1 * 1000 * 60).subscribe(x => {
+        this.autoRefresh();
+      })
+    );
   }
+
+  /**
+   * @method autoRefresh
+   * @desc Interval - auto-refresh data function
+   */
+  public autoRefresh(){
+    if (this.isAutoRefreshChecked == true) {
+      this.refreshStatusData();
+      this.toastr.info('Data Auto-Refreshed...', 'bl-status: Data Service');
+    }
+  }
+
 
   /**
    * @method buildPieceChart
@@ -414,7 +439,7 @@ export class HomeComponent implements OnInit {
           return false;
         }
       });
-      console.log("Status Patterns: " + JSON.stringify(statusPatterns));
+      //console.log("Status Patterns: " + JSON.stringify(statusPatterns));
       // tally pattern amounts for each day
       for (var j = 0; j < statusPatterns.length; j++) {
         //console.log("each sampleStatus: " + statusPatterns[j].sampleStatus);
@@ -1534,6 +1559,30 @@ export class HomeComponent implements OnInit {
       'paperwork-issue': value === 'Issue',
       'paperwork-complete': value === 'Complete',
     };
+  }
+
+  /**
+   * @method checkAutoRefresh
+   * @desc set the auto-data-refresh state
+   * @param {$event} change event
+   */
+  private checkAutoRefresh($event){
+    this.isAutoRefreshChecked = !this.isAutoRefreshChecked;
+    if (this.isAutoRefreshChecked){
+      this.toastr.success('Auto-Refreshed Enabled...', 'bl-status: Data Service');
+    } else{
+      this.toastr.warning('Auto-Refreshed Disabled...', 'bl-status: Data Service');
+    }
+  }
+
+  /**
+   * @method ngOnDestroy
+   * @description Component clean-up
+   */
+  ngOnDestroy() {
+    /** dispose of any active subsriptions to prevent memory leak */
+    // TODO: use the suscriptions array for ALL Observables
+    this.subscriptions.forEach((sub) => { sub.unsubscribe(); })
   }
 
 }

@@ -1,6 +1,46 @@
 <div class="container">
   <div class="starter-template">
-    <h1>Admininstration</h1>
-    <p class="lead">bl-status Administration Page</p>
+      <h3 style="margin-top: 3px;">
+        <b>bl-status:</b> Administration</h3>
+  </div>
+  <div>
+    <tabset [justified]="true">
+      <tab heading="">
+        <template tabHeading>
+          <i class="glyphicon glyphicon-list"></i> Logs
+        </template>
+        <div class="container">
+          <div>
+            <h3>Application Log</h3>
+          </div>
+          <hr>
+          <div>
+            <h3>Server Log</h3>
+          </div>
+        </div>
+      </tab>
+      <tab heading="">
+        <template tabHeading>
+          <i class="glyphicon glyphicon-user"></i> Users
+        </template>
+        <div class="container">
+          <div>
+            <h3>Manage Users</h3>
+          </div>
+          <hr>
+        </div>
+      </tab>
+      <tab heading="">
+        <template tabHeading>
+          <i class="glyphicon glyphicon-hdd"></i> Data
+        </template>
+        <div class="container">
+          <div>
+            <h3>Manage Data</h3>
+          </div>
+          <hr>
+        </div>
+      </tab>
+    </tabset>
   </div>
 </div>

@@ -1,11 +1,15 @@
 <div class="container">
   <ngx-loading [show]="!isDataLoaded"></ngx-loading>
-  <div class="starter-template">
-    <img style="float: left" [src]="logoImagePath" alt="EMS Logo" width="81" height="46">
-    <h1 style="margin-left: 85px; padding-top: 0px; padding-bottom: 0px; font-size:3.5em; color:darkslategray"><b>bl-status:</b></h1>
-    <h3 style="margin-top: -12px; padding-top: -5px;">EMS Box Loading Status Tracking System</h3>
+  <div class="starter-template row">
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-1">
+      <img style="float: left;padding-right: 5px" [src]="logoImagePath" alt="EMS Logo" width="96" height="55">
+    </div>
+    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-11">
+      <h1 style="margin-left: 0px; padding-left: 0px;margin-top: 0px; padding-top: 0px; padding-bottom: 0px; font-size:2.0em; color:darkslategray"><b>bl-status:</b></h1>
+      <h3 style="margin-left: 0px; padding-left: 0px;margin-top: -12px; padding-top: -5px;">EMS Box Loading Status Tracking System</h3>
+    </div>
   </div>
-  <hr>
+  <hr style="margin-top: 0px; margin-bottom: 0px;">
   <div class="row" style="margin-bottom: -15px;">
     <div class="col-md-6">
       <h4 class="text-muted">Number of Pieces for Direct Dropship (Non-EPOP) - <b>Next 7 days</b></h4>
@@ -62,7 +66,7 @@
       </div>
     </div>
   </div>
-  <hr>
+  <hr style="margin-top: 15px;margin-bottom: 5px;">
   <!-- pattern filter -->
   <div class="row">
     <div class="col-xs-* col-sm-6 col-md-* col-lg-3">
@@ -96,7 +100,12 @@
       </span>
   </div>
 </div>
-<div style="text-align: left;color: #3577ba;"><small><b>data last refreshed @:</b> {{this.lastRefreshDate}}</small></div>
+<div style="text-align: left;color: #3577ba;">
+  <small>
+    <b>data last refreshed @:</b> {{this.lastRefreshDate}}
+  </small>
+  <span style="float: right; color: #3577ba; font-weight:normal"><small><label><input type="checkbox" [checked]="isAutoRefreshChecked" (change)="checkAutoRefresh($event)"> Enable Auto Refresh (every 60 seconds)</label></small></span>
+</div>
 <!-- data table (ngx-datatable) -->
 <div style="margin-top: 15px">
   <ngx-datatable (page)="onPage($event)" class="material expandable" #homeTable [rows]="rows" [columns]="columns" [columnMode]="'force'"

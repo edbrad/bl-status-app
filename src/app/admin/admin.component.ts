@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 //
 import { ToastrService } from 'ngx-toastr';
+import { TabsetComponent } from 'ngx-bootstrap';
 //
 import { LoggingService } from '../logging.service';
 
@@ -10,6 +11,8 @@ import { LoggingService } from '../logging.service';
   styleUrls: ['./admin.component.css']
 })
 export class AdminComponent implements OnInit {
+
+
 
   constructor(private logger: LoggingService, private toastr: ToastrService) { }
 
@@ -22,5 +25,7 @@ export class AdminComponent implements OnInit {
       }
     }));
   }
+
+
 
 }
