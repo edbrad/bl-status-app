@@ -39,9 +39,13 @@
         </span>
     </div>
   </div>
-  <div style="text-align: left;color: #3577ba;"><small><b>data last refreshed @:</b> {{this.lastRefreshDate}}</small></div>
+  <div style="text-align: left;color: #3577ba;">
+    <small>
+      <b>data last refreshed @:</b> {{this.lastRefreshDate}}</small>
+      <span style="float: right; color: #3577ba; font-weight:normal"><small><label><input type="checkbox" [checked]="isAutoRefreshChecked" (change)="checkAutoRefresh($event)"> Enable Auto Refresh (every 60 seconds)</label></small></span>
+  </div>
   <div>
-</div>
+  </div>
   <!-- data table (ngx-datatable) -->
   <div style="margin-top: 15px">
     <ngx-datatable (page)="onPage($event)" class="material expandable" #postalAccountingTable [rows]="rows" [columns]="columns"

@@ -1,5 +1,7 @@
 declare var moment: any;  /** prevent TypeScript typings error when using non-TypeSCript Lib (momentJS) */
-import { Component, OnInit, ViewEncapsulation, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewEncapsulation, ViewChild } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
+import { Subscription } from "rxjs/Subscription";
 
 // 3rd-party/open-source components
 import { ToastrService } from 'ngx-toastr';
@@ -25,11 +27,15 @@ export class SampleroomComponent implements OnInit {
   isLetterFilterChecked: boolean = false;
   isFlatFilterChecked: boolean = false;
   isCompleteFilterChecked: boolean = false;
-  lastRefreshDate: Date = moment();
-  public pieceTypes:Array<string> = ['Letter', 'Flat'];
+  lastRefreshDate: any = moment();
+  public pieceTypes: Array<string> = ['Letter', 'Flat', 'PC'];
   public statuses:Array<string> = ['New', 'In Process', 'Issue', 'Replacement', 'Complete'];
   public selectedFilterPieceType: string = null;
   public selectedFilterStatus: string = null;
+  public isAutoRefreshChecked: boolean = false;
+
+  // Observable Subscriptions Array
+  private subscriptions: Subscription[] = [];
 
   // data-table variables (ngx-datatable)
   rows: any[] = [];
@@ -125,15 +131,15 @@ export class SampleroomComponent implements OnInit {
       alwaysShowCalendars: false,
       ranges: {
         'Today': [moment(), moment()],
-        'This Week': [moment(), moment().add(6, 'days')],
-        'This Month': [moment(), moment().subtract(1, 'months')],
-        'Last Month': [moment().subtract(1, 'month'), moment()],
+        'Next 7 Days': [moment(), moment().add(6, 'days')],
+        'Next 30 Days': [moment(), moment().add(30, 'days')],
+        'Last 30 Days': [moment().subtract(30, 'days'), moment()],
         'Last 3 Months': [moment().subtract(3, 'month'), moment()],
         'Last 6 Months': [moment().subtract(6, 'month'), moment()],
         'Last 12 Months': [moment().subtract(12, 'month'), moment()],
       },
-      startDate: moment().subtract(1, 'month'),
-      endDate: moment()
+      startDate: moment(),
+      endDate: moment().add(6, 'days')
     };
   }
 
@@ -141,9 +147,9 @@ export class SampleroomComponent implements OnInit {
    * initialize this component
    */
   ngOnInit() {
-     // set initial date range
-    this.daterange.start = moment().subtract(1, 'month');
-    this.daterange.end = moment();
+    // set date range
+    this.daterange.start = moment();
+    this.daterange.end = moment().add(6, 'days');
     // get latest status data
     this.refreshStatusData();
     // log the event
@@ -153,6 +159,25 @@ export class SampleroomComponent implements OnInit {
         this.toastr.error('Logging Error!', 'bl-status: Logging Service');
       }
     }));
+
+    // add auto-refresh initialization
+    // TODO: use the suscriptions array for other Observables
+    this.subscriptions.push(
+      Observable.interval(1 * 1000 * 60).subscribe(x => {
+        this.autoRefresh();
+      })
+    );
+  }
+
+  /**
+   * @method autoRefresh
+   * @desc Interval - auto-refresh data function
+   */
+  public autoRefresh(){
+    if (this.isAutoRefreshChecked == true) {
+      this.refreshStatusData();
+      this.toastr.info('Data Auto-Refreshed...', 'bl-status: Data Service');
+    }
   }
 
   /**
@@ -225,6 +250,14 @@ export class SampleroomComponent implements OnInit {
       }
 
       // filter drop date range
+      /** update the start date if the current day has changed */
+      if (this.daterange.start){
+        if (!this.lastRefreshDate.isSame(moment(), 'd')){
+          this.daterange.start = moment();
+          this.daterange.end = moment().add(6, 'days');
+        }
+      }
+
       if (this.daterange.start && this.daterange.end) {
         var s = this.daterange.start;
         var e = this.daterange.end;
@@ -352,6 +385,30 @@ export class SampleroomComponent implements OnInit {
       'paperwork-issue': value === 'Issue',
       'paperwork-complete': value === 'Complete',
     };
+  }
+
+  /**
+   * @method checkAutoRefresh
+   * @desc set the auto-data-refresh state
+   * @param {$event} change event
+   */
+  private checkAutoRefresh($event){
+    this.isAutoRefreshChecked = !this.isAutoRefreshChecked;
+    if (this.isAutoRefreshChecked){
+      this.toastr.success('Auto-Refreshed Enabled...', 'bl-status: Data Service');
+    } else{
+      this.toastr.warning('Auto-Refreshed Disabled...', 'bl-status: Data Service');
+    }
+  }
+
+  /**
+   * @method ngOnDestroy
+   * @description Component clean-up
+   */
+  ngOnDestroy() {
+    /** dispose of any active subsriptions to prevent memory leak */
+    // TODO: use the suscriptions array for ALL Observables
+    this.subscriptions.forEach((sub) => { sub.unsubscribe(); })
   }
 
 }

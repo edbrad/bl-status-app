@@ -31,8 +31,8 @@ export class HomeComponent implements OnInit {
   public isPieDataloaded: boolean = false;
   public logoImagePath: string = "../assets/EMS_Envelope_T.png";
   public filterText: string = null;
-  public lastRefreshDate: Date = moment();
-  public pieceTypes: Array<string> = ['Letter', 'Flat'];
+  public lastRefreshDate: any = moment();
+  public pieceTypes: Array<string> = ['Letter', 'Flat', 'PC'];
   public statuses: Array<string> = ['New', 'In Process', 'Issue', 'Replacement', 'Complete'];
   public selectedFilterPieceType: string = null;
   public selectedFilterStatus: string = null;
@@ -187,15 +187,15 @@ export class HomeComponent implements OnInit {
       alwaysShowCalendars: false,
       ranges: {
         'Today': [moment(), moment()],
-        'This Week': [moment(), moment().add(6, 'days')],
-        'This Month': [moment(), moment().subtract(1, 'months')],
-        'Last Month': [moment().subtract(1, 'month'), moment()],
+        'Next 7 Days': [moment(), moment().add(6, 'days')],
+        'Next 30 Days': [moment(), moment().add(30, 'days')],
+        'Last 30 Days': [moment().subtract(30, 'days'), moment()],
         'Last 3 Months': [moment().subtract(3, 'month'), moment()],
         'Last 6 Months': [moment().subtract(6, 'month'), moment()],
         'Last 12 Months': [moment().subtract(12, 'month'), moment()],
       },
-      startDate: moment().subtract(1, 'month'),
-      endDate: moment()
+      startDate: moment(),
+      endDate: moment().add(6, 'days')
     };
   }
 
@@ -205,8 +205,8 @@ export class HomeComponent implements OnInit {
    */
   ngOnInit() {
     // set date range
-    this.daterange.start = moment().subtract(1, 'month');
-    this.daterange.end = moment();
+    this.daterange.start = moment();
+    this.daterange.end = moment().add(6, 'days');
     // get latest status data
     this.refreshStatusData();
     // log the event
@@ -601,6 +601,14 @@ export class HomeComponent implements OnInit {
       }
 
       // filter drop date range
+      /** update the start date if the current day has changed */
+      if (this.daterange.start){
+        if (!this.lastRefreshDate.isSame(moment(), 'd')){
+          this.daterange.start = moment();
+          this.daterange.end = moment().add(6, 'days');
+        }
+      }
+
       if (this.daterange.start && this.daterange.end) {
         var s = this.daterange.start;
         var e = this.daterange.end;
