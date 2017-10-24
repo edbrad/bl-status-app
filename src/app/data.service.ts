@@ -14,7 +14,8 @@ export class DataService {
   constructor(private http: Http, private authenticationService: AuthenticationService) { }
 
   // bl-status API endpoint root URL
-  public urlRoot: string = 'http://172.16.248.19:8080/api'; // test
+  //public urlRoot: string = 'http://172.16.248.19:8080/api'; // test
+  public urlRoot: string = 'http://172.16.168.210:8080/api'; // test2
   //public urlRoot: string = 'http://172.16.248.19:8080/api'; // prod
 
   // pyACCESS (Job Ticket MS ACCESS db access) API endpoint root URL
