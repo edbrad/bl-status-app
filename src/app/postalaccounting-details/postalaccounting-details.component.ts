@@ -54,7 +54,8 @@ export class PostalaccountingDetailsComponent implements OnInit, OnDestroy {
   public currentWorksheetPattern: string = "";
 
   // API url
-  public urlRoot: string = 'http://172.16.248.19:8080/api'; // test
+  //public urlRoot: string = 'http://172.16.248.19:8080/api'; // test
+  public urlRoot: string = 'http://172.16.168.210:8080/api'; // test 2
   //urlRoot: string = 'http://172.16.248.19:8080/api'; // prod
 
   // intialize Pallet Tag file uploader instance
