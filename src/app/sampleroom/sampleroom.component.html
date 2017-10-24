@@ -51,8 +51,11 @@
           [rowClass]="getRowClass">
           <!-- Column Templates -->
           <ngx-datatable-column name="Pattern">
-            <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+            <!--<ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
               <a [routerLink]="['/sampleroom-details', row.pattern]"><strong>{{row.pattern}}</strong></a>
+            </ng-template>-->
+            <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+                <a [routerLink]=[] (click)="updateSampleStatus(template, row)"><strong>{{row.pattern}}</strong></a>
             </ng-template>
           </ngx-datatable-column>
           <ngx-datatable-column name="Project" [width]="280">
@@ -93,3 +96,78 @@
         </ngx-datatable>
       </div>
 </div>
+<!-- Modal Window -->
+<ng-template #template>
+    <div class="modal-header">
+      <h4 class="modal-title pull-left">Sample Room - Pattern Details / Status Update</h4>
+      <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+        <div style="margin-bottom: 0px;">Pattern: <span style="color: #3577ba;"><b>{{samplePatternData.pattern}}</b></span>
+          <span *ngIf="checkBadgeStatus('New')" class="badge">New</span>
+          <span *ngIf="checkBadgeStatus('In Process')" class="badge badge-info">In Process</span>
+          <span *ngIf="checkBadgeStatus('Complete')" class="badge badge-success">Complete!</span>
+          <span *ngIf="checkBadgeStatus('Replacement')" class="badge badge-warning">Replacement</span>
+          <span *ngIf="checkBadgeStatus('Issue')" class="badge badge-error">Issue!</span>
+        </div>
+        <div style="width: 200px; margin-top: 10px;">
+            <ng-select [items]="statuses" (selected)="statusSelected($event)"
+              placeholder="Change Status">
+            </ng-select>
+        </div>
+        <div style="margin-top: 15px; margin-bottom: 2px;">
+            <table class="table table-condensed table-bordered table-responsive">
+              <tr>
+                <td class="col-md-2 col-sm-1"><b>Client:</b></td>
+                <td class="col-md-4 col-sm-2">{{samplePatternData.client}}</td>
+              </tr>
+              <tr>
+                <td class="col-md-2 col-sm-1"><b>Project:</b></td>
+                <td class="col-md-4 col-sm-2">{{samplePatternData.project}}</td>
+              </tr>
+              <tr>
+                <td class="col-md-2 col-sm-1"><b>Drop Date:</b></td>
+                <td class="col-md-4 col-sm-2">{{samplePatternData.dropDate}}</td>
+              </tr>
+              <tr>
+                <td class="col-md-2 col-sm-1"><b>Total Pieces:</b></td>
+                <td class="col-md-4 col-sm-2">{{samplePatternData.total | addCommas}}</td>
+              </tr>
+              <tr>
+                <td class="col-md-2 col-sm-1"><b>Type:</b></td>
+                <td class="col-md-4 col-sm-2">{{samplePatternData.type}}</td>
+              </tr>
+              <tr>
+                <td class="col-md-2 col-sm-1"><b>Piece Specs:</b></td>
+                <td class="col-md-4 col-sm-2">{{samplePatternData.Specs}}</td>
+              </tr>
+              <tr>
+                <td class="col-md-2 col-sm-1"><b>Sample Note(s):</b></td>
+                <td class="col-md-4 col-sm-2">{{samplePatternData.sampleRoomNotes}}</td>
+              </tr>
+              <tr>
+                <td class="col-md-2 col-sm-1"><b>Accounting Note(s):</b></td>
+                <td class="col-md-4 col-sm-2">{{samplePatternData.postalAccountingNotes}}</td>
+              </tr>
+            </table>
+          </div>
+          <div style="color: #b94a48;">
+              <label class="checkbox-inline">
+                  <input type="checkbox" [checked]="isSampleIssueChecked" (change)="checkSampleIssue($event)">There is an issue!
+              </label>
+              <span *ngIf="isSampleIssueChecked" class="badge badge-error">Issue!</span>
+            </div>
+            <small style="color: #3577ba;">Add/Edit/Update Note(s):</small><br>
+            <textarea ref-textarea [(ngModel)]="sampleRoomNotes" rows="4" cols="50"></textarea>
+          </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-danger btn-s" style="margin-top: 0px; margin-bottom: 0px;"(click)="clearSampleRoomNotes()">
+          <span class="glyphicon glyphicon-trash"></span> Clear</button>
+      <button type="button" class="btn btn-primary btn-s" style="margin-top: 0px; margin-bottom: 0px;" (click)="saveSampleStatus()">
+        <span class="glyphicon glyphicon-save"></span> Save</button>
+    </div>
+
+  </ng-template>
+

@@ -1,5 +1,6 @@
 declare var moment: any;  /** prevent TypeScript typings error when using non-TypeSCript Lib (momentJS) */
 import { Component, OnInit, OnDestroy, ViewEncapsulation, ViewChild } from '@angular/core';
+import { TemplateRef } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from "rxjs/Subscription";
 
@@ -7,6 +8,9 @@ import { Subscription } from "rxjs/Subscription";
 import { ToastrService } from 'ngx-toastr';
 import { DaterangepickerConfig } from 'ng2-daterangepicker';
 import { DaterangePickerComponent } from 'ng2-daterangepicker';
+import { BsModalService } from 'ngx-bootstrap/modal';
+import { BsModalRef } from 'ngx-bootstrap/modal/modal-options.class';
+import { SelectModule } from 'ng2-select';
 
 // custom services
 import { LoggingService } from '../logging.service';
@@ -33,6 +37,17 @@ export class SampleroomComponent implements OnInit {
   public selectedFilterPieceType: string = null;
   public selectedFilterStatus: string = null;
   public isAutoRefreshChecked: boolean = false;
+
+  // modal window reference
+  public modalRef: BsModalRef;
+  public samplePatternData: any = {};
+
+  public isSampleIssueChecked: boolean = false;  /** SampleRoom Issue flag */
+  public user = this.authenticationService.getUsername();
+
+  // selected pattern's details
+  public sampleRoomNotes: string = "";    /** storage for current Pattern Notes/Issues (for updates) */
+  public status: string = "";             /** current Pattern status */
 
   // Observable Subscriptions Array
   private subscriptions: Subscription[] = [];
@@ -124,6 +139,7 @@ export class SampleroomComponent implements OnInit {
     private ds: DataService,
     private toastr: ToastrService,
     private authenticationService: AuthenticationService,
+    private modalService: BsModalService,
     private daterangepickerOptions: DaterangepickerConfig) {
     // initialize DatePicker (for drop date range filter)
     this.daterangepickerOptions.settings = {
@@ -400,6 +416,136 @@ export class SampleroomComponent implements OnInit {
       this.toastr.warning('Auto-Refreshed Disabled...', 'bl-status: Data Service');
     }
   }
+
+  /**
+   * @method updateSampleStatus
+   * @description activate the Modal window for updating the Sample Status
+   * @param {TemplateRef} template a reference to the HTML template content for the Modal window
+   */
+  public updateSampleStatus(template: TemplateRef<any>, row: any) {
+    // show the modal window
+    this.modalRef = this.modalService.show(template);
+
+    //console.log("row: " + JSON.stringify(row));
+
+    // clear clear "problem" fields (that can't be re-saved)
+    delete row._id;
+    delete row.fileStamp;
+    delete row.timeStamp;
+
+    // hold current status data
+    this.samplePatternData = row;
+    this.sampleRoomNotes = this.samplePatternData.sampleRoomNotes;
+    this.status = this.samplePatternData.sampleStatus;
+
+    // check if there is an existing issue and set status
+    if (this.status == "Issue"){
+      this.isSampleIssueChecked = true;
+    }
+    else{
+      this.isSampleIssueChecked = false;
+    }
+  }
+
+  /**
+   * @method clearSampleRoomNotes
+   * @desc clear Sample Notes/Issues
+   */
+  public clearSampleRoomNotes() {
+    this.sampleRoomNotes = "";
+    this.isSampleIssueChecked = false;
+    this.status = "In Process";
+  }
+
+  /**
+   * @method checkSampleIssue
+   * @desc check/uncheck Issue flag checkbox
+   */
+  public checkSampleIssue(){
+    this.isSampleIssueChecked = !this.isSampleIssueChecked;
+
+    if(this.isSampleIssueChecked){
+      this.status = "Issue";
+    } else{
+      this.status = "In Process";
+    }
+  }
+
+  /**
+   * @method checkBadgeStatus
+   * @desc display/hide status badges based on given pattern's status
+   * @param {string} status the given pattern's status
+   */
+  public checkBadgeStatus(status: string){
+    if (this.samplePatternData.sampleStatus == status){
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
+   *
+   * @param value
+   */
+  statusSelected(value: any){
+    this.status = value.text;
+  }
+
+
+  /**
+   * @method saveSampleStatus()
+   * @desc save Sample Room Status/Notes/Issue changes to the database
+   */
+  public saveSampleStatus(){
+    var data: any = {};
+
+    this.samplePatternData.sampleStatus = this.status;
+    this.samplePatternData.sampleRoomNotes = this.sampleRoomNotes;
+
+    if (this.isSampleIssueChecked) {
+      this.samplePatternData.sampleRoomNotes = this.sampleRoomNotes;
+      this.samplePatternData.sampleStatus = "Issue";
+    } else {
+      this.samplePatternData.sampleRoomNotes = this.sampleRoomNotes;
+    }
+
+    data = this.samplePatternData;
+    var response = this.ds.updateStatusByPattern(this.samplePatternData.pattern, data)
+    .subscribe((data => {
+      console.log("Note response: " + response);
+      // log the event
+      this.logger.addToLog("INFO", "Sample Status Updated: " +
+      "Status: " + this.samplePatternData.sampleStatus + "Notes: " +  this.sampleRoomNotes +
+      " User: " + this.user).subscribe((data => {
+          const ack = data;
+          if (!ack) {
+            this.toastr.error('Logging Error!', 'bl-status: Logging Service');
+          }
+        }));
+
+      // close the Modal
+      this.modalRef.hide();
+
+      // refresh the data
+      this.refreshStatusData();
+
+      // done
+      this.toastr.success('Sample Status Updated!', 'bl-status: Data Service');
+    }))
+  }
+
+
+
+
+
+
+
+
+
+
+
+
 
   /**
    * @method ngOnDestroy

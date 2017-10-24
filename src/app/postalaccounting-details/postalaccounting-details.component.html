@@ -29,8 +29,20 @@
       <tr>
         <td class="col-md-2 col-sm-1"><b>Total Pieces:</b></td>
         <td class="col-md-4 col-sm-2">{{patternData.total | addCommas}}</td>
-        <td class="col-md-2 col-sm-1"><b>EPOP?:</b></td>
-        <td class="col-md-4 col-sm-2">{{patternData.isEPOP}}</td>
+        <td class="col-md-2 col-sm-1"><b>Mail Class:</b></td>
+        <td class="col-md-4 col-sm-2">{{patternData.mailClass}}</td>
+      </tr>
+      <tr>
+        <td class="col-md-2 col-sm-1"><b>Drop Date:</b></td>
+        <td class="col-md-4 col-sm-2">{{patternData.dropDate}}</td>
+        <td class="col-md-2 col-sm-1"><b>Sample Status:</b></td>
+        <td class="col-md-4 col-sm-2">{{patternData.sampleStatus}}</td>
+      </tr>
+      <tr>
+        <td class="col-md-2 col-sm-1"><b>CAR-RT Pieces?:</b></td>
+        <td class="col-md-4 col-sm-2">{{patternData.hasCRRT}}</td>
+        <td class="col-md-2 col-sm-1"><b>Origin/Local Pieces?:</b></td>
+        <td class="col-md-4 col-sm-2">{{patternData.hasOrigin}}</td>
       </tr>
       <tr>
         <td class="col-md-2 col-sm-1"><b>Single Piece Count:</b></td>

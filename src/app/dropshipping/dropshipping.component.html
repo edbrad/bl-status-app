@@ -73,9 +73,9 @@
                 </tr>
                 <tr>
                   <td class="col-md-2 col-sm-1">
-                    <b>CAR-RT?:</b>
+                    <b>Project:</b>
                   </td>
-                  <td class="col-md-4 col-sm-2">{{row.hasCRRT}}</td>
+                  <td class="col-md-4 col-sm-2">{{row.project}}</td>
                   <td class="col-md-2 col-sm-1">
                     <b>Tray/Sack Max:</b>
                   </td>
@@ -83,23 +83,13 @@
                 </tr>
                 <tr>
                   <td class="col-md-2 col-sm-1">
-                    <b>Internal Project ID:</b>
+                    <b>Drop Date:</b>
                   </td>
-                  <td class="col-md-4 col-sm-2">{{row.projectID}}</td>
+                  <td class="col-md-4 col-sm-2">{{row.dropDate}}</td>
                   <td class="col-md-2 col-sm-1">
-                    <b>Internal Qual. ID:</b>
+                    <b>Piece Count:</b>
                   </td>
-                  <td class="col-md-4 col-sm-2">{{row.qualID}}</td>
-                </tr>
-                <tr>
-                  <td class="col-md-2 col-sm-1">
-                    <b>Single Piece Count:</b>
-                  </td>
-                  <td class="col-md-4 col-sm-2">{{row.spr}}</td>
-                  <td class="col-md-2 col-sm-1">
-                    <b>Failed Piece Count:</b>
-                  </td>
-                  <td class="col-md-4 col-sm-2">{{row.fail}}</td>
+                  <td class="col-md-4 col-sm-2">{{row.total | addCommas}}</td>
                 </tr>
                 <tr>
                   <td class="col-md-2 col-sm-1">
