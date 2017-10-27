@@ -135,7 +135,7 @@ export class HomeComponent implements OnInit {
   private picker: DaterangePickerComponent;
   public daterange: any = {};
   public selectedDate(value: any, datepicker?: any) {
-    //console.log("date value: " + JSON.stringify(value));
+    console.log("date value: " + JSON.stringify(value));
     // save selected date range
     datepicker.start = value.start;
     datepicker.end = value.end;
@@ -612,6 +612,8 @@ export class HomeComponent implements OnInit {
       if (this.daterange.start && this.daterange.end) {
         var s = this.daterange.start;
         var e = this.daterange.end;
+        console.log("filter date start: " + this.daterange.start);
+        console.log("filter date end: " + this.daterange.end);
         dateFilter = textFilter.filter(function (d) {
           var date = moment(d.dropDate, "MM/DD/YY");
           var startDate = moment(s, "MM/DD/YY");
