@@ -303,7 +303,7 @@ export class HomeComponent implements OnInit {
     var statusPatterns: Array<any> = [];
     var statusCounts: Array<any> = [];
 
-    // get date range (7 days).
+    // set statuses
     statuses[0] = "New";
     statuses[1] = "In Process";
     statuses[2] = "Issue";
@@ -601,13 +601,13 @@ export class HomeComponent implements OnInit {
       }
 
       // filter drop date range
-      /** update the start date if the current day has changed */
+      /** update the start date if the current day has changed
       if (this.daterange.start){
         if (!this.lastRefreshDate.isSame(moment(), 'd')){
           this.daterange.start = moment();
           this.daterange.end = moment().add(6, 'days');
         }
-      }
+      }*/
 
       if (this.daterange.start && this.daterange.end) {
         var s = this.daterange.start;
