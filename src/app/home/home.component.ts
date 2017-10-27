@@ -194,8 +194,8 @@ export class HomeComponent implements OnInit {
         'Last 6 Months': [moment().subtract(6, 'month'), moment()],
         'Last 12 Months': [moment().subtract(12, 'month'), moment()],
       },
-      startDate: moment(),
-      endDate: moment().add(6, 'days')
+      startDate:moment().calendar(),
+      endDate: moment().add(6, 'days').calendar()
     };
   }
 
@@ -205,8 +205,8 @@ export class HomeComponent implements OnInit {
    */
   ngOnInit() {
     // set date range
-    this.daterange.start = moment();
-    this.daterange.end = moment().add(6, 'days');
+    this.daterange.start = moment().calendar();
+    this.daterange.end = moment().add(6, 'days').calendar();
     // get latest status data
     this.refreshStatusData();
     // log the event
