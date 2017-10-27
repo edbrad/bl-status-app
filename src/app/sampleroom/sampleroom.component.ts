@@ -154,8 +154,8 @@ export class SampleroomComponent implements OnInit {
         'Last 6 Months': [moment().subtract(6, 'month'), moment()],
         'Last 12 Months': [moment().subtract(12, 'month'), moment()],
       },
-      startDate: moment(),
-      endDate: moment().add(6, 'days')
+      startDate: moment().format("MM/DD/YY"),
+      endDate: moment().add(6, 'days').format("MM/DD/YY")
     };
   }
 
@@ -164,8 +164,8 @@ export class SampleroomComponent implements OnInit {
    */
   ngOnInit() {
     // set date range
-    this.daterange.start = moment();
-    this.daterange.end = moment().add(6, 'days');
+    this.daterange.start = moment().format("MM/DD/YY");
+    this.daterange.end = moment().add(6, 'days').format("MM/DD/YY");
     // get latest status data
     this.refreshStatusData();
     // log the event

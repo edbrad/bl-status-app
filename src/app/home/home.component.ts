@@ -135,7 +135,7 @@ export class HomeComponent implements OnInit {
   private picker: DaterangePickerComponent;
   public daterange: any = {};
   public selectedDate(value: any, datepicker?: any) {
-    console.log("date value: " + JSON.stringify(value));
+    //console.log("date value: " + JSON.stringify(value));
     // save selected date range
     datepicker.start = value.start;
     datepicker.end = value.end;
@@ -194,8 +194,8 @@ export class HomeComponent implements OnInit {
         'Last 6 Months': [moment().subtract(6, 'month'), moment()],
         'Last 12 Months': [moment().subtract(12, 'month'), moment()],
       },
-      startDate:moment().calendar(),
-      endDate: moment().add(6, 'days').calendar()
+      startDate:moment().format("MM/DD/YY"),
+      endDate: moment().add(6, 'days').format("MM/DD/YY")
     };
   }
 
@@ -205,8 +205,8 @@ export class HomeComponent implements OnInit {
    */
   ngOnInit() {
     // set date range
-    this.daterange.start = moment().calendar();
-    this.daterange.end = moment().add(6, 'days').calendar();
+    this.daterange.start = moment().format("MM/DD/YY");
+    this.daterange.end = moment().add(6, 'days').format("MM/DD/YY");
     // get latest status data
     this.refreshStatusData();
     // log the event
@@ -601,19 +601,19 @@ export class HomeComponent implements OnInit {
       }
 
       // filter drop date range
-      /** update the start date if the current day has changed
+      /** update the start date if the current day has changed */
       if (this.daterange.start){
         if (!this.lastRefreshDate.isSame(moment(), 'd')){
           this.daterange.start = moment();
           this.daterange.end = moment().add(6, 'days');
         }
-      }*/
+      }
 
       if (this.daterange.start && this.daterange.end) {
         var s = this.daterange.start;
         var e = this.daterange.end;
-        console.log("filter date start: " + this.daterange.start);
-        console.log("filter date end: " + this.daterange.end);
+        //console.log("filter date start: " + this.daterange.start);
+        //console.log("filter date end: " + this.daterange.end);
         dateFilter = textFilter.filter(function (d) {
           var date = moment(d.dropDate, "MM/DD/YY");
           var startDate = moment(s, "MM/DD/YY");
@@ -1583,6 +1583,18 @@ export class HomeComponent implements OnInit {
     } else{
       this.toastr.warning('Auto-Refreshed Disabled...', 'bl-status: Data Service');
     }
+  }
+
+  pieChartClicked(){
+
+  }
+
+  lineChartClicked(){
+
+  }
+
+  barChartClicked(){
+
   }
 
   /**

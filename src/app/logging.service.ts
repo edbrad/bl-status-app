@@ -11,7 +11,8 @@ export class LoggingService {
   constructor(private http: Http, private authenticationService: AuthenticationService) { }
 
   // bl-status API endpoint root URL
-  urlRoot: string = 'http://172.16.248.19:8080/api'; // test
+  //urlRoot: string = 'http://172.16.248.19:8080/api'; // test
+  urlRoot: string = 'http://172.16.168.210:8080/api'; // test2
 
   /**
    * @method addToLog
