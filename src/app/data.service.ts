@@ -170,6 +170,24 @@ export class DataService {
   }
 
   /**
+   * @method getLogs
+   * @description retrieve log data from the API, based on date range
+   * @param type
+   * @param startDate
+   * @param endDate
+   */
+  public getLogs(type: string, startDate: string, endDate: string) {
+    // set API url
+    const url = this.urlRoot + '/log-view/?logType=' + type + '&startDate=' + startDate + '&endDate=' + endDate;
+
+    // create an Observable for the HTTP/REST API call and transform (map) the response to a JSON array
+    console.log("getLogs url: " + url)
+    return this.http.get(url)
+      .map((response: Response) => response.json());
+
+  }
+
+  /**
    * @method getAJob
    * @description get job information for a single job from the pyACCESS (Job Ticket) API
    * @param {string} jobnum the given EMS Job number

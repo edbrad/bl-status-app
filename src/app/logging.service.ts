@@ -24,11 +24,11 @@ export class LoggingService {
     var user = this.authenticationService.getUsername();
     // if no user, set as Guest
     if (!user.replace(/\s/g, '').length) {
-      user = "GUEST";
+      user = "Guest";
     }
     return this.http.post(this.urlRoot + '/logs/',
       {
-        timeStamp: moment().format(),
+        timeStamp: "", // populated by API
         user: user,
         ipAddress: "", // populated by API
         level: level,
@@ -38,4 +38,5 @@ export class LoggingService {
         return response.json();
       });
   }
+
 }

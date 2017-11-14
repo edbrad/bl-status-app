@@ -1,7 +1,8 @@
 <div class="container">
+  <ngx-loading [show]="!isDataLoaded" [config]="{ backdropBorderRadius: '14px' }"></ngx-loading>
   <div class="starter-template">
-      <h3 style="margin-top: 3px;">
-        <b>bl-status:</b> Administration</h3>
+    <h3 style="margin-top: 3px;">
+      <b>bl-status:</b>Administration</h3>
   </div>
   <div>
     <tabset [justified]="true">
@@ -14,9 +15,33 @@
             <h3>Application Log</h3>
           </div>
           <hr>
-          <div>
-            <h3>Server Log</h3>
-          </div>
+        </div>
+        <!-- data table (ngx-datatable) -->
+        <div style="margin-top: 15px">
+          <ngx-datatable (page)="onPage($event)" class="material expandable" #appLogTable [rows]="appLogRows" [columns]="columns"
+            [sortType]="'multi'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="35" [limit]="50" [rowClass]="getRowClass">
+            <!-- Column Templates -->
+            <ngx-datatable-column name="Time Stamp" [width]="200">
+              <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+                {{convertLogDate(row.timeStamp.$date)}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="User" [width]="100">
+              <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+                {{row.user}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Level" [cellClass]="getLevelCellClass" [width]="100">
+              <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+                {{row.level}}
+              </ng-template>
+            </ngx-datatable-column>
+            <ngx-datatable-column name="Message" [width]="500">
+              <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+                {{row.message}}
+              </ng-template>
+            </ngx-datatable-column>
+          </ngx-datatable>
         </div>
       </tab>
       <tab heading="">
