@@ -54,8 +54,11 @@
             <!--<ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
               <a [routerLink]="['/sampleroom-details', row.pattern]"><strong>{{row.pattern}}</strong></a>
             </ng-template>-->
-            <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+            <!--<ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
                 <a [routerLink]=[] (click)="updateSampleStatus(template, row)"><strong>{{row.pattern}}</strong></a>
+            </ng-template>-->
+            <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+              <strong>{{row.pattern}}</strong>
             </ng-template>
           </ngx-datatable-column>
           <ngx-datatable-column name="Project" [width]="280">
@@ -68,16 +71,21 @@
               {{row.mailClass}}
             </ng-template>
           </ngx-datatable-column>
-          <ngx-datatable-column name="Sample Status" [cellClass]="getSampleCellClass">
+          <!--<ngx-datatable-column name="Sample Status" [cellClass]="getSampleCellClass">
             <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
               {{row.sampleStatus}}
             </ng-template>
-          </ngx-datatable-column>
-          <!--<ngx-datatable-column name="Paperwork Status" [cellClass]="getPaperworkCellClass">
-            <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
-              {{row.paperworkStatus}}
-            </ng-template>
           </ngx-datatable-column>-->
+          <ngx-datatable-column name="Sample Status" [cellClass]="getSampleCellClass">
+            <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
+              <select
+                [(ngModel)]="row.sampleStatus"
+                (change)="updateStatus($event, 'sampleStatus', rowIndex, row.pattern)">
+                <option value="New">New</option>
+                <option value="Complete">Complete</option>
+              </select>
+            </ng-template>
+          </ngx-datatable-column>
           <ngx-datatable-column name="Piece Type">
             <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
               {{row.type}}

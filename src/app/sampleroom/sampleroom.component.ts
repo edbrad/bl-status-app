@@ -33,7 +33,7 @@ export class SampleroomComponent implements OnInit {
   isCompleteFilterChecked: boolean = false;
   lastRefreshDate: any = moment();
   public pieceTypes: Array<string> = ['Letter', 'Flat', 'PC'];
-  public statuses:Array<string> = ['New', 'In Process', 'Issue', 'Replacement', 'Complete'];
+  public statuses:Array<string> = ['New', 'Complete'];
   public selectedFilterPieceType: string = null;
   public selectedFilterStatus: string = null;
   public isAutoRefreshChecked: boolean = false;
@@ -59,6 +59,7 @@ export class SampleroomComponent implements OnInit {
   expanded: any = {};
   expanded_save: any = {};
   timeout: any;
+  editing = {};
   @ViewChild('sampleRoomTable') table: any; /** data table html reference */
 
   // datepicker config - date range (ng2-daterangepicker)
@@ -318,24 +319,11 @@ export class SampleroomComponent implements OnInit {
         //console.log("filter status: " + this.selectedFilterStatus);
         status = this.selectedFilterStatus
         statusFilter = pieceFilter.filter(function (d) {
-          if (status == "Complete") {
-            /* both sample and paperwork have to be complete to be considered "Complete" */
-            if (d.sampleStatus == status && d.paperworkStatus == status) {
-              return true;
-            }
-            else {
-              return false;
-            }
+          if (d.sampleStatus == status) {
+            return true;
           }
           else {
-            /* for other statuses (In Process, Issue, etc..), either sample or paperwork can be
-            a match to be considered the given status */
-            if (d.sampleStatus == status || d.paperworkStatus == status) {
-              return true;
-            }
-            else {
-              return false;
-            }
+            return false;
           }
         });
       }
@@ -348,7 +336,7 @@ export class SampleroomComponent implements OnInit {
       this.rows = statusFilter;
 
       // whenever the filter changes, always go back to the first page
-      this.table.offset = 0;
+      //this.table.offset = 0;
 
       // update last refresh time display
       this.lastRefreshDate = moment();
@@ -513,7 +501,7 @@ export class SampleroomComponent implements OnInit {
     data = this.samplePatternData;
     var response = this.ds.updateStatusByPattern(this.samplePatternData.pattern, data)
     .subscribe((data => {
-      console.log("Note response: " + response);
+      console.log("Note response: " + JSON.stringify(response));
       // log the event
       this.logger.addToLog("INFO", "Sample Status Updated: " +
       "Status: " + this.samplePatternData.sampleStatus + "Notes: " +  this.sampleRoomNotes +
@@ -535,14 +523,45 @@ export class SampleroomComponent implements OnInit {
     }))
   }
 
+  /**
+   *
+   * @param event
+   * @param columnName
+   * @param rowIndex
+   * @param pattern
+   */
+  updateStatus(event, columnName, rowIndex, pattern) {
+    console.log("status change: " + event.target.value)
+    var data: any = {}; // update data object
 
+    // set information to be updated (pattern status)
+    this.samplePatternData = {};
+    this.samplePatternData.pattern = pattern;
+    this.samplePatternData.sampleStatus = event.target.value;
+    data = this.samplePatternData;
 
+    // call API to update status in database
+    var response = this.ds.updateStatusByPattern(this.samplePatternData.pattern, data)
+      .subscribe((data => {
+        console.log("Note response: " + response);
+        // log the event
+        this.logger.addToLog("INFO", "Sample Status Updated: " +
+          " Pattern: " + this.samplePatternData.pattern +
+          " - Status: " + this.samplePatternData.sampleStatus + " - Notes: " + this.sampleRoomNotes +
+          " - User: " + this.user).subscribe((data => {
+            const ack = data;
+            if (!ack) {
+              this.toastr.error('Logging Error!', 'bl-status: Logging Service');
+            }
+          }));
 
+        // refresh the data
+        this.refreshStatusData();
 
-
-
-
-
+        // done
+        this.toastr.success('Sample Status Updated!', 'bl-status: Data Service');
+      }))
+  }
 
 
 

@@ -330,24 +330,11 @@ export class PostalaccountingComponent implements OnInit {
         //console.log("filter status: " + this.selectedFilterStatus);
         status = this.selectedFilterStatus
         statusFilter = pieceFilter.filter(function (d) {
-          if (status == "Complete") {
-            /* both sample and paperwork have to be complete to be considered "Complete" */
-            if (d.sampleStatus == status && d.paperworkStatus == status) {
-              return true;
-            }
-            else {
-              return false;
-            }
+          if (d.paperworkStatus == status) {
+            return true;
           }
           else {
-            /* for other statuses (In Process, Issue, etc..), either sample or paperwork can be
-            a match to be considered the given status */
-            if (d.sampleStatus == status || d.paperworkStatus == status) {
-              return true;
-            }
-            else {
-              return false;
-            }
+            return false;
           }
         });
       }
