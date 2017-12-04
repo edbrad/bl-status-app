@@ -181,7 +181,7 @@ export class PostalaccountingComponent implements OnInit {
     // get latest status data
     this.refreshStatusData();
     // log the event
-    this.logger.addToLog("INFO", "Postal Accounting Component activated.").subscribe((data => {
+    this.logger.addToLog("SUCCESS", "Postal Accounting Component activated.").subscribe((data => {
       const ack = data;
       if (!ack){
         this.toastr.error('Logging Error!', 'bl-status: Logging Service');

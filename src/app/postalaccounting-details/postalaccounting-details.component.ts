@@ -128,7 +128,7 @@ export class PostalaccountingDetailsComponent implements OnInit, OnDestroy {
     // get the given pattern data
     this.getPatternData(this.patternCode);
     // log the event
-    this.logger.addToLog("INFO", "Postal Accounting Pattern Details Component activated.").subscribe((data => {
+    this.logger.addToLog("SUCCESS", "Postal Accounting Pattern Details Component activated.").subscribe((data => {
       const ack = data;
       if (!ack){
         this.toastr.error('Logging Error!', 'bl-status: Logging Service');
@@ -353,7 +353,7 @@ export class PostalaccountingDetailsComponent implements OnInit, OnDestroy {
         //console.log("Delete response: " + response);
         this.getPatternData(this.patternCode);
         // log the event
-        this.logger.addToLog("INFO", "Pallet PDF File Deleted - File: " +
+        this.logger.addToLog("SUCCESS", "Pallet PDF File Deleted - File: " +
           this.patternData.currentPalletTagFile + " Pattern: " +
           this.patternCode + " User: " + this.user).subscribe((data => {
             const ack = data;
@@ -376,7 +376,7 @@ export class PostalaccountingDetailsComponent implements OnInit, OnDestroy {
         //console.log("Delete response: " + response);
         this.getPatternData(this.patternCode);
         // log the event
-        this.logger.addToLog("INFO", "Worksheet PDF File Deleted - File: " +
+        this.logger.addToLog("SUCCESS", "Worksheet PDF File Deleted - File: " +
           this.patternData.currentPalletWorksheetFile + " Pattern: " +
           this.patternCode + " User: " + this.user).subscribe((data => {
             const ack = data;
@@ -428,7 +428,7 @@ export class PostalaccountingDetailsComponent implements OnInit, OnDestroy {
       //console.log("Note response: " + response);
       this.getPatternData(this.patternCode);
       // log the event
-      this.logger.addToLog("INFO", "Postal Accouting Notes Updated: " +
+      this.logger.addToLog("SUCCESS", "Postal Accouting Notes Updated: " +
       this.postalAccountingNotes +
       " User: " + this.user).subscribe((data => {
           const ack = data;

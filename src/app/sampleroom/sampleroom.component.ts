@@ -170,7 +170,7 @@ export class SampleroomComponent implements OnInit {
     // get latest status data
     this.refreshStatusData();
     // log the event
-    this.logger.addToLog("INFO", "Sample Room Component activated.").subscribe((data => {
+    this.logger.addToLog("SUCCESS", "Sample Room Component activated.").subscribe((data => {
       const ack = data;
       if (!ack){
         this.toastr.error('Logging Error!', 'bl-status: Logging Service');
@@ -503,7 +503,7 @@ export class SampleroomComponent implements OnInit {
     .subscribe((data => {
       console.log("Note response: " + JSON.stringify(response));
       // log the event
-      this.logger.addToLog("INFO", "Sample Status Updated: " +
+      this.logger.addToLog("SUCCESS", "Sample Status Updated: " +
       "Status: " + this.samplePatternData.sampleStatus + "Notes: " +  this.sampleRoomNotes +
       " User: " + this.user).subscribe((data => {
           const ack = data;
@@ -545,7 +545,7 @@ export class SampleroomComponent implements OnInit {
       .subscribe((data => {
         console.log("Note response: " + response);
         // log the event
-        this.logger.addToLog("INFO", "Sample Status Updated: " +
+        this.logger.addToLog("SUCCESS", "Sample Status Updated: " +
           " Pattern: " + this.samplePatternData.pattern +
           " - Status: " + this.samplePatternData.sampleStatus + " - Notes: " + this.sampleRoomNotes +
           " - User: " + this.user).subscribe((data => {

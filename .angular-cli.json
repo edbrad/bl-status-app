@@ -25,6 +25,7 @@
         "../node_modules/ngx-toastr/toastr.css",
         "../node_modules/@swimlane/ngx-datatable/release/index.css",
         "../node_modules/@swimlane/ngx-datatable/release/themes/material.css",
+        "../node_modules/@swimlane/ngx-datatable/release/themes/bootstrap.css",
         "../node_modules/@swimlane/ngx-datatable/release/assets/icons.css",
         "ng2-select.css"
       ],
@@ -32,6 +33,7 @@
         "../node_modules/pdfmake/build/pdfmake.min.js",
         "../node_modules/pdfmake/build/vfs_fonts.js",
         "../node_modules/moment/min/moment.min.js",
+        "../node_modules/moment-timezone/builds/moment-timezone-with-data.min.js",
         "../node_modules/chart.js/dist/Chart.bundle.min.js",
         "../node_modules/file-saver/FileSaver.min.js"
       ],

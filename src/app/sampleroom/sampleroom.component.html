@@ -46,7 +46,7 @@
         </div>
       <!-- data table (ngx-datatable) -->
       <div style="margin-top: 15px">
-        <ngx-datatable (page)="onPage($event)" class="material expandable" #sampleRoomTable [rows]="rows" [columns]="columns"
+        <ngx-datatable (page)="onPage($event)" class="material" #sampleRoomTable [rows]="rows" [columns]="columns"
           [columnMode]="'force'" [sortType]="'multi'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="'auto'" [limit]="20"
           [rowClass]="getRowClass">
           <!-- Column Templates -->

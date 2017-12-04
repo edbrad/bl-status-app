@@ -29,7 +29,7 @@ export class AuthGuard implements CanActivate {
             // logged in and token not expired, so return true
             console.log("token-okay!")
             // log the event
-            this.logger.addToLog("INFO", "Auth Token Validation Successful.").subscribe((data => {
+            this.logger.addToLog("SUCCESS", "Auth Token Validation Successful.").subscribe((data => {
               const ack = data;
               if (!ack) {
                 this.toastr.error('Logging Error!', 'bl-status: Logging Service');
@@ -41,7 +41,7 @@ export class AuthGuard implements CanActivate {
             // expired token so redirect to login page with the return url
             console.log("bad-token!")
             // log the event
-            this.logger.addToLog("INFO", "Auth. Token Expired - Re-Login Required!").subscribe((data => {
+            this.logger.addToLog("WARN", "Auth. Token Expired - Re-Login Required!").subscribe((data => {
               const ack = data;
               if (!ack) {
                 this.toastr.error('Logging Error!', 'bl-status: Logging Service');

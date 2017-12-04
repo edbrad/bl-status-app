@@ -22,10 +22,10 @@ export class AdminComponent implements OnInit {
   // misc variables
   isDataLoaded:boolean = false;
   lastRefreshDate: any = moment();
-  public messageTypes: Array<string> = ['INFO', 'WARNING', 'ERROR', 'SUCCESS'];
-  public userTypes: Array<string> = ['Guest', 'Sampleroom', 'Accounting', 'Dropshipping'];
-  public selectedFilterLogType: string = null;
-  public selectedFilterUserType: string = null;
+  public logLevels: Array<string> = ['INFO', 'WARN', 'ERROR', 'SUCCESS'];
+  public users: Array<string> = ['Guest', 'sampleroom', 'accounting', 'dropshipping', 'admin']; /* TODO: get from DB */
+  public selectedLogLevel: string = null;
+  public selectedUser: string = null;
   public isAutoRefreshChecked: boolean = false;
 
   // Observable Subscriptions Array
@@ -62,50 +62,56 @@ export class AdminComponent implements OnInit {
     this.daterange.label = value.label;
 
     // refresh data
-    this.refreshLogData("app", this.daterange.start, this.daterange.end);
+    this.refreshLogData("app");
   }
 
   /**
-   * @method logTypeSelected
+   * @method levelFilterSelected
    * @desc apply log type filter selection
    * @param {any} value the selected piece type filter value
    */
-  public logTypeFilterSelected(value: any) {
-    this.selectedFilterLogType = value.text;
-    this.refreshLogData("app", this.daterange.start, this.daterange.end);
+  public levelFilterSelected(value: any) {
+    this.selectedLogLevel = value.text;
+    this.refreshLogData("app");
   }
 
   /**
-   * @method logTypeRemoved
+   * @method levelFilterRemoved
    * @desc remove log type filter selection
    * @param {any} value
    */
-  public logTypeFilterRemoved(value: any) {
-    this.selectedFilterLogType = null;
-    this.refreshLogData("app", this.daterange.start, this.daterange.end);
+  public levelFilterRemoved(value: any) {
+    this.selectedLogLevel = null;
+    this.refreshLogData("app");
   }
 
   /**
-   * @method userTypeSelected
+   * @method userFilterSelected
    * @desc apply user type filter selection
    * @param {any} value the selected piece type filter value
    */
-  public userTypeFilterSelected(value: any) {
-    this.selectedFilterUserType = value.text;
-    this.refreshLogData("app", this.daterange.start, this.daterange.end);
+  public userFilterSelected(value: any) {
+    this.selectedUser = value.text;
+    this.refreshLogData("app");
   }
 
   /**
-   * @method userTypeRemoved
+   * @method userFilterRemoved
    * @desc remove user type filter selection
    * @param {any} value
    */
-  public userTypeFilterRemoved(value: any) {
-    this.selectedFilterUserType = null;
-    this.refreshLogData("app", this.daterange.start, this.daterange.end);
+  public userFilterRemoved(value: any) {
+    this.selectedUser = null;
+    this.refreshLogData("app");
   }
 
-
+  /**
+   *
+   * @param logger
+   * @param ds
+   * @param toastr
+   * @param daterangepickerOptions
+   */
   constructor(private logger: LoggingService,
     private ds: DataService,
     private toastr: ToastrService,
@@ -116,25 +122,28 @@ export class AdminComponent implements OnInit {
       alwaysShowCalendars: false,
       ranges: {
         'Today': [moment(), moment()],
-        'Last 7 Days': [moment(), moment().subtract(6, 'days')],
+        'Last 7 Days': [moment().subtract(6, 'days'), moment()],
         'Last 30 Days': [moment().subtract(30, 'days'), moment()],
         'Last 3 Months': [moment().subtract(3, 'month'), moment()],
         'Last 6 Months': [moment().subtract(6, 'month'), moment()],
         'Last 12 Months': [moment().subtract(12, 'month'), moment()],
       },
       startDate: moment().format("MM/DD/YY"),
-      endDate: moment().add(6, 'days').format("MM/DD/YY")
+      endDate: moment().format("MM/DD/YY")
     };
   }
 
+  /**
+   *
+   */
   ngOnInit() {
     // set date range
     this.daterange.start = moment().format("MM/DD/YY");
     this.daterange.end = moment().format("MM/DD/YY");
     // get latest status data
-    this.refreshLogData("app", this.daterange.start, this.daterange.end);
+    this.refreshLogData("app");
      // log the event
-     this.logger.addToLog("INFO", "Admin Component activated.").subscribe((data => {
+     this.logger.addToLog("SUCCESS", "Admin Component activated.").subscribe((data => {
       const ack = data;
       if (!ack){
         this.toastr.error('Logging Error!', 'bl-status: Logging Service');
@@ -156,15 +165,26 @@ export class AdminComponent implements OnInit {
    */
   public autoRefresh(){
     if (this.isAutoRefreshChecked == true) {
-      this.refreshLogData("app", this.daterange.start, this.daterange.end);
+      this.refreshLogData("app");
       this.toastr.info('Data Auto-Refreshed...', 'bl-status: Data Service');
     }
   }
 
-  refreshLogData(type: string, startDate: string, endDate: string) {
+  /**
+   * @method refreshLogData
+   * @desc Get latest log data and apply filters
+   * @param type
+   * @param startDate
+   * @param endDate
+   */
+  refreshLogData(type: string) {
     // get all statuses from the external REST API
-    var eventFilter: any[] = [];       /* Log Event Type filter data bucket */
-    var userTypeFilter: any[] = [];    /* User Type filter data bucket */
+    var userFilter: any[] = [];       /* User filter data bucket */
+    var levelFilter: any[] = [];      /* Message level filter data bucket */
+    var user: string = null;
+    var level: string = null;
+    var startDate = moment(this.daterange.start).format('MM/DD/YY')
+    var endDate = moment(this.daterange.end).format('MM/DD/YY')
     // show loading indicator
     this.isDataLoaded = false;
     this.ds.getLogs(type, startDate, endDate).subscribe((data => {
@@ -172,16 +192,51 @@ export class AdminComponent implements OnInit {
       this.isDataLoaded = true;
       // cache data for datatable filtering
       this.temp = [...data];    /** datatable */
-      // save data from database
-      this.appLogRows = data;
+
+      // filter by user
+      if (this.selectedUser) {
+        console.log("filter user: " + this.selectedUser);
+        user = this.selectedUser;
+        userFilter = this.temp.filter(function (d) {
+          if (d.user == user) {
+            return true;
+          }
+          else {
+            return false;
+          }
+        });
+      }
+      else {
+        // pass-through - no user filter selected
+        userFilter = [...this.temp]
+      }
+
+      // filter by level
+      if (this.selectedLogLevel) {
+        console.log("filter log level: " + this.selectedLogLevel);
+        level = this.selectedLogLevel;
+        levelFilter = userFilter.filter(function (d) {
+          if (d.level == level) {
+            return true;
+          }
+          else {
+            return false;
+          }
+        });
+      }
+      else {
+        // pass-through - no log level filter selected
+        levelFilter = [...userFilter]
+      }
+
+      // apply filtered data to table
+      this.appLogRows = [...levelFilter];
 
       // whenever the filter changes, always go back to the first page
-      this.table.offset = 0;
+      //this.table.offset = 0;
 
       // update last refresh time display
       this.lastRefreshDate = moment();
-
-      console.log("log: "+ JSON.stringify(this.appLogRows));
 
     }));
   }
@@ -201,12 +256,24 @@ export class AdminComponent implements OnInit {
    * @method convertLogDate
    * @description convert the app log date field returned from the API (in milliseconds) to a traditionally human-readable
    * format (Date + Time)
-   * @param milliseconds
+   * @param {string} milliseconds the UTC/GMT date/time returned from the API(MongoDB), in milliseconds
    */
   public convertLogDate(milliseconds: string){
     var logDate = new Date(milliseconds);
-    var outDate = moment(logDate).format('MM/DD/YY, h:mm:ss a')
+    var wrkDate = moment.utc(logDate).subtract(6, 'hours'); // set to local time (GMT-06:00)
+    var outDate = wrkDate.local().format();
     return outDate;
+  }
+
+
+  /**
+   * @method ngOnDestroy
+   * @description Component clean-up
+   */
+  ngOnDestroy() {
+    /** dispose of any active subsriptions to prevent memory leak */
+    // TODO: use the suscriptions array for ALL Observables
+    this.subscriptions.forEach((sub) => { sub.unsubscribe(); })
   }
 
 }

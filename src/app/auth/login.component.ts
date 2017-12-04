@@ -34,7 +34,7 @@ export class LoginComponent implements OnInit {
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
 
     // log the event
-    this.logger.addToLog("INFO", "Login Component activated.").subscribe((data => {
+    this.logger.addToLog("SUCCESS", "Login Component activated.").subscribe((data => {
       const ack = data;
       if (!ack){
         this.toastr.error('Logging Error!', 'bl-status: Logging Service');
@@ -57,7 +57,7 @@ export class LoginComponent implements OnInit {
         if (data.success == true) {
 
           // log the event
-          this.logger.addToLog("INFO", "Login successful: Username: " + this.model.username).subscribe((data => {
+          this.logger.addToLog("SUCCESS", "Login successful: Username: " + this.model.username).subscribe((data => {
             const ack = data;
             if (!ack) {
               this.toastr.error('Logging Error!', 'bl-status: Logging Service');

@@ -69,7 +69,7 @@ export class SampleroomDetailsComponent implements OnInit {
     // get the given pattern data
     this.getPatternData(this.patternCode);
     // log the event
-    this.logger.addToLog("INFO", "Sample Room Pattern Details Component activated.").subscribe((data => {
+    this.logger.addToLog("SUCCESS", "Sample Room Pattern Details Component activated.").subscribe((data => {
       const ack = data;
       if (!ack){
         this.toastr.error('Logging Error!', 'bl-status: Logging Service');
@@ -133,7 +133,7 @@ export class SampleroomDetailsComponent implements OnInit {
       //console.log("Note response: " + response);
       this.getPatternData(this.patternCode);
       // log the event
-      this.logger.addToLog("INFO", "Sample Rooom Notes Updated: " +
+      this.logger.addToLog("SUCCESS", "Sample Rooom Notes Updated: " +
       this.sampleRoomNotes +
       " User: " + this.user).subscribe((data => {
           const ack = data;
@@ -216,7 +216,7 @@ export class SampleroomDetailsComponent implements OnInit {
       //console.log("Note response: " + response);
       this.getPatternData(this.patternCode);
       // log the event
-      this.logger.addToLog("INFO", "Sample Status Updated: " +
+      this.logger.addToLog("SUCCESS", "Sample Status Updated: " +
       wrkStatus +
       " User: " + this.user).subscribe((data => {
           const ack = data;

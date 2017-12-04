@@ -2,7 +2,7 @@
   <ngx-loading [show]="!isDataLoaded" [config]="{ backdropBorderRadius: '14px' }"></ngx-loading>
   <div class="starter-template">
     <h3 style="margin-top: 3px;">
-      <b>bl-status:</b>Administration</h3>
+      <b>bl-status: </b>Administration</h3>
   </div>
   <div>
     <tabset [justified]="true">
@@ -11,15 +11,36 @@
           <i class="glyphicon glyphicon-list"></i> Logs
         </ng-template>
         <div class="container">
-          <div>
-            <h3>Application Log</h3>
-          </div>
-          <hr>
-        </div>
         <!-- data table (ngx-datatable) -->
-        <div style="margin-top: 15px">
-          <ngx-datatable (page)="onPage($event)" class="material expandable" #appLogTable [rows]="appLogRows" [columns]="columns"
-            [sortType]="'multi'" [headerHeight]="50" [footerHeight]="50" [rowHeight]="35" [limit]="50" [rowClass]="getRowClass">
+        <div style="margin-top: 1px; margin-right:20px">
+          <h3>Application Log</h3>
+          <!-- Date Filter -->
+          <div style="padding:0px;margin-top:7px;width: 50%;float: left;">
+            <span>Log Date Range: </span>
+            <input type="text" name="daterangeInput" daterangepicker [options]="options" (selected)="selectedDate($event, daterange)"
+              class="input" style="padding:7px;" />
+            <!-- refresh -->
+            <button (click)="refreshLogData('app')" class="btn btn-primary" style="margin-left: 10px">
+                <span class="glyphicon glyphicon-refresh"></span> Refresh
+            </button>
+          </div>
+          <!-- User Filter -->
+          <span style='padding:8px;margin:0px;width:25%;float:left;'>
+            <ng-select [allowClear]="true" [items]="users" (selected)="userFilterSelected($event)" (removed)="userFilterRemoved($event)"
+              placeholder="User Filter">
+            </ng-select>
+          </span>
+          <!-- Level Filter -->
+          <span style='padding:8px;margin:0px;width:25%;float:right;'>
+            <ng-select [allowClear]="true" [items]="logLevels" (selected)="levelFilterSelected($event)" (removed)="levelFilterRemoved($event)"
+              placeholder="Level Filter">
+            </ng-select>
+          </span>&nbsp;
+          <div style="color: #3577ba;">
+              <small><b>data last refreshed @:</b> {{this.lastRefreshDate}}</small>
+          </div>
+          <ngx-datatable (page)="onPage($event)" class="bootstrap" #appLogTable [rows]="appLogRows" [columns]="columns"
+            [sortType]="'multi'" [headerHeight]="20" [footerHeight]="50" [rowHeight]="30" [limit]="50" [rowClass]="getRowClass">
             <!-- Column Templates -->
             <ngx-datatable-column name="Time Stamp" [width]="200">
               <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
@@ -36,13 +57,14 @@
                 {{row.level}}
               </ng-template>
             </ngx-datatable-column>
-            <ngx-datatable-column name="Message" [width]="700">
+            <ngx-datatable-column name="Message" [width]="780">
               <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
                 {{row.message}}
               </ng-template>
             </ngx-datatable-column>
           </ngx-datatable>
         </div>
+      </div>
       </tab>
       <tab heading="">
         <ng-template tabHeading>

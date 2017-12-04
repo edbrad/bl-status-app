@@ -105,7 +105,7 @@ export class DropshippingComponent implements OnInit {
     // get latest status data
     this.refreshStatusData();
     // log the event
-    this.logger.addToLog("INFO", "Drop Shipping Component activated.").subscribe((data => {
+    this.logger.addToLog("SUCCESS", "Drop Shipping Component activated.").subscribe((data => {
       const ack = data;
       if (!ack) {
         this.toastr.error('Logging Error!', 'bl-status: Logging Service');
@@ -429,7 +429,7 @@ export class DropshippingComponent implements OnInit {
 
       // log the event
       this.toastr.success('File Downloaded!', 'bl-status: Data Service');
-      this.logger.addToLog("INFO", "File Downloaded: " + file).subscribe((data => {
+      this.logger.addToLog("SUCCESS", "File Downloaded: " + file).subscribe((data => {
         const ack = data;
         if (!ack) {
           this.toastr.error('Logging Error!', 'bl-status: Logging Service');

@@ -210,7 +210,7 @@ export class HomeComponent implements OnInit {
     // get latest status data
     this.refreshStatusData();
     // log the event
-    this.logger.addToLog("INFO", "Home Component activated.").subscribe((data => {
+    this.logger.addToLog("SUCCESS", "Home Component activated.").subscribe((data => {
       const ack = data;
       if (!ack) {
         this.toastr.error('Logging Error!', 'bl-status: Logging Service');
