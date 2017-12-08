@@ -42,8 +42,8 @@ export class SampleroomDetailsComponent implements OnInit {
   public statuses: Array<string> =  ["New", "In Process", "Complete"];
 
   // API url
-  public urlRoot: string = 'http://172.16.248.19:8080/api'; // test
-  //urlRoot: string = 'http://172.16.248.19:8080/api'; // prod
+  //public urlRoot: string = 'http://172.16.248.19:8080/api'; // test
+  urlRoot: string = 'http://172.16.248.19:8080/api'; // prod
 
   /**
    * @constructor

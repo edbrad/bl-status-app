@@ -66,7 +66,8 @@ export class PostalaccountingComponent implements OnInit {
   //currentWorksheetPattern: string = "";
 
   // API url
-  urlRoot: string = 'http://172.16.248.19:8080/api'; // test
+  //urlRoot: string = 'http://172.16.248.19:8080/api'; // test
+  public urlRoot: string = 'http://172.16.168.210:8080/api';
 
   // intialize Pallet Tag file uploader instance
 
