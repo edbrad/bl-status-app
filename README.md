@@ -199,7 +199,6 @@ The backend document-based database (*MongoDB*) has no inherent schema requireme
 | **tagsUser**      | Print room Employee name/code               | *QualToPDF* - (SQL **quals** table) |
 | **hasCRRT**       | Does Presort contain CAR-RT pieces          | *QualToPDF* - (SQL **quals** table) |
 | **hasOrigin**     | Does Presort contain Origin-SCF/NDC pieces  | *QualToPDF* - (SQL **quals** table) |
-| **hasOrigin**     | Does Presort contain Origin-SCF/NDC pieces  | *QualToPDF* - (SQL **quals** table) |
 | -- | -- | -- |
 | **projectName**   | Mailing Campaign/Project Name               | *QualToPDF* - (SQL **projects** table) |
 | **EstDropDate**   | Estimated Drop Date                         | *QualToPDF* - (SQL **projects** table) |
