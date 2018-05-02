@@ -67,7 +67,8 @@ export class PostalaccountingComponent implements OnInit {
 
   // API url
   //urlRoot: string = 'http://172.16.248.19:8080/api'; // test
-  public urlRoot: string = 'http://172.16.168.210:8080/api';
+  //public urlRoot: string = 'http://172.16.168.210:8080/api';
+  public urlRoot: string = 'http://bl-status-api.emsmail.com/api'; // prod
 
   // intialize Pallet Tag file uploader instance
 
@@ -409,7 +410,7 @@ export class PostalaccountingComponent implements OnInit {
    * @desc set the auto-data-refresh state
    * @param {$event} change event
    */
-  private checkAutoRefresh($event){
+  checkAutoRefresh($event){
     this.isAutoRefreshChecked = !this.isAutoRefreshChecked;
     if (this.isAutoRefreshChecked){
       this.toastr.success('Auto-Refreshed Enabled...', 'bl-status: Data Service');

@@ -396,7 +396,7 @@ export class SampleroomComponent implements OnInit {
    * @desc set the auto-data-refresh state
    * @param {$event} change event
    */
-  private checkAutoRefresh($event){
+  checkAutoRefresh($event){
     this.isAutoRefreshChecked = !this.isAutoRefreshChecked;
     if (this.isAutoRefreshChecked){
       this.toastr.success('Auto-Refreshed Enabled...', 'bl-status: Data Service');

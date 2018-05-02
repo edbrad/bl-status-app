@@ -55,8 +55,9 @@ export class PostalaccountingDetailsComponent implements OnInit, OnDestroy {
 
   // API url
   //public urlRoot: string = 'http://172.16.248.19:8080/api'; // test
-  public urlRoot: string = 'http://172.16.168.210:8080/api'; // test 2
+  //public urlRoot: string = 'http://172.16.168.210:8080/api'; // test 2
   //urlRoot: string = 'http://172.16.248.19:8080/api'; // prod
+  public urlRoot: string = 'http://bl-status-api.emsmail.com/api'; // prod
 
   // intialize Pallet Tag file uploader instance
   public uploaderPalletTags: FileUploader = new FileUploader({

@@ -3,6 +3,7 @@ import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { enableProdMode } from '@angular/core';
 
 // 3rd-party/open-source components
 import { CollapseModule } from 'ngx-bootstrap';
@@ -11,7 +12,8 @@ import { Daterangepicker } from 'ng2-daterangepicker';
 import { ToastrModule } from 'ngx-toastr';
 import { NgxDatatableModule } from '@swimlane/ngx-datatable';
 import { ChartsModule } from 'ng2-charts';
-import { FileSelectDirective } from 'ng2-file-upload';
+//import { FileSelectDirective } from 'ng2-file-upload';
+import { FileUploadModule } from 'ng2-file-upload';
 import { LoadingModule, ANIMATION_TYPES } from 'ngx-loading';
 import { SelectModule } from 'ng2-select';
 import { TabsModule } from 'ngx-bootstrap/tabs';
@@ -51,7 +53,7 @@ import { SampleroomDetailsComponent } from './sampleroom-details/sampleroom-deta
     DropshippingComponent,
     AdminComponent,
     AddCommasPipe,
-    FileSelectDirective,
+    //FileSelectDirective,
     PostalaccountingDetailsComponent,
     SampleroomDetailsComponent
   ],
@@ -70,6 +72,7 @@ import { SampleroomDetailsComponent } from './sampleroom-details/sampleroom-deta
     NgxDatatableModule,
     Daterangepicker,
     ChartsModule,
+    FileUploadModule,
     ModalModule.forRoot(),
     LoadingModule.forRoot({
       animationType: ANIMATION_TYPES.threeBounce,

@@ -43,7 +43,8 @@ export class SampleroomDetailsComponent implements OnInit {
 
   // API url
   //public urlRoot: string = 'http://172.16.248.19:8080/api'; // test
-  urlRoot: string = 'http://172.16.248.19:8080/api'; // prod
+  //urlRoot: string = 'http://172.16.248.19:8080/api'; // prod
+  public urlRoot: string = 'http://bl-status-api.emsmail.com/api'; // prod
 
   /**
    * @constructor

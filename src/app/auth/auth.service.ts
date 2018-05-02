@@ -16,7 +16,8 @@ export class AuthenticationService {
 
   // API endpoint root URL
   //urlRoot: string = 'http://172.16.248.19:8080/api'; // test
-  urlRoot: string = 'http://172.16.168.210:8080/api'; // test 2
+  //urlRoot: string = 'http://172.16.168.210:8080/api'; // test 2
+  public urlRoot: string = 'http://bl-status-api.emsmail.com/api'; // prod
 
   loggedInUser: string = "";            // currently logged in user (name)
   loggedIn: boolean = false;            // current logged in status

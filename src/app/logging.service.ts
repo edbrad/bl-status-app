@@ -12,7 +12,8 @@ export class LoggingService {
 
   // bl-status API endpoint root URL
   //urlRoot: string = 'http://172.16.248.19:8080/api'; // test
-  urlRoot: string = 'http://172.16.168.210:8080/api'; // test2
+  //urlRoot: string = 'http://172.16.168.210:8080/api'; // test2
+  public urlRoot: string = 'http://bl-status-api.emsmail.com/api'; // prod
 
   /**
    * @method addToLog

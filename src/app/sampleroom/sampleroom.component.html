@@ -63,7 +63,7 @@
           </ngx-datatable-column>
           <ngx-datatable-column name="Project" [width]="280">
             <ng-template let-rowIndex="rowIndex" let-row="row" ngx-datatable-cell-template>
-              {{row.project}}
+              {{row.projectName}}
             </ng-template>
           </ngx-datatable-column>
           <ngx-datatable-column name="Mail Class">
@@ -133,7 +133,7 @@
               </tr>
               <tr>
                 <td class="col-md-2 col-sm-1"><b>Project:</b></td>
-                <td class="col-md-4 col-sm-2">{{samplePatternData.project}}</td>
+                <td class="col-md-4 col-sm-2">{{samplePatternData.projectName}}</td>
               </tr>
               <tr>
                 <td class="col-md-2 col-sm-1"><b>Drop Date:</b></td>
@@ -149,7 +149,7 @@
               </tr>
               <tr>
                 <td class="col-md-2 col-sm-1"><b>Piece Specs:</b></td>
-                <td class="col-md-4 col-sm-2">{{samplePatternData.Specs}}</td>
+                <td class="col-md-4 col-sm-2">{{samplePatternData.specs}}</td>
               </tr>
               <tr>
                 <td class="col-md-2 col-sm-1"><b>Sample Note(s):</b></td>
